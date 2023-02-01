@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4250FF59-FF25-47F8-A687-DDF224714939}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookify.Domain", "src\Cookify.Domain\Cookify.Domain.csproj", "{4F584344-9B02-4708-A5E0-90F31FC840F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookify.Infrastructure", "src\Cookify.Infrastructure\Cookify.Infrastructure.csproj", "{C2D74D5C-65DC-4972-96AC-97A42118B61F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookify.Application", "src\Cookify.Application\Cookify.Application.csproj", "{C05D0AEB-0E2C-4E90-8957-55F34E15BAE8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookify.Api", "src\Cookify.Api\Cookify.Api.csproj", "{D68C28B6-0E1A-4156-BADC-9DE1885CAA0A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{B10F70F0-7DB7-484D-8E5A-68C71F03EAEA}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+		.dockerignore = .dockerignore
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F584344-9B02-4708-A5E0-90F31FC840F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F584344-9B02-4708-A5E0-90F31FC840F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F584344-9B02-4708-A5E0-90F31FC840F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F584344-9B02-4708-A5E0-90F31FC840F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2D74D5C-65DC-4972-96AC-97A42118B61F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2D74D5C-65DC-4972-96AC-97A42118B61F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2D74D5C-65DC-4972-96AC-97A42118B61F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2D74D5C-65DC-4972-96AC-97A42118B61F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C05D0AEB-0E2C-4E90-8957-55F34E15BAE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C05D0AEB-0E2C-4E90-8957-55F34E15BAE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C05D0AEB-0E2C-4E90-8957-55F34E15BAE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C05D0AEB-0E2C-4E90-8957-55F34E15BAE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D68C28B6-0E1A-4156-BADC-9DE1885CAA0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D68C28B6-0E1A-4156-BADC-9DE1885CAA0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D68C28B6-0E1A-4156-BADC-9DE1885CAA0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D68C28B6-0E1A-4156-BADC-9DE1885CAA0A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4F584344-9B02-4708-A5E0-90F31FC840F1} = {4250FF59-FF25-47F8-A687-DDF224714939}
+		{C2D74D5C-65DC-4972-96AC-97A42118B61F} = {4250FF59-FF25-47F8-A687-DDF224714939}
+		{C05D0AEB-0E2C-4E90-8957-55F34E15BAE8} = {4250FF59-FF25-47F8-A687-DDF224714939}
+		{D68C28B6-0E1A-4156-BADC-9DE1885CAA0A} = {4250FF59-FF25-47F8-A687-DDF224714939}
+	EndGlobalSection
+EndGlobal

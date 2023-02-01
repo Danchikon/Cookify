@@ -1,0 +1,12 @@
+using Cookify.Domain.Common.Entities;
+
+namespace Cookify.Domain.Common.Repositories;
+
+public interface IRepository<TEntity> : IReadOnlyRepository<TEntity> where TEntity : IEntity<Guid>
+{
+    Task<Guid> AddAsync(TEntity entity);
+    ValueTask PartiallyUpdateAsync(Guid id, PartialEntity<TEntity> partialEntity);
+    ValueTask UpdateAsync(TEntity entity);
+    ValueTask RemoveAsync(Guid id);
+    
+}

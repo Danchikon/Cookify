@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "WRBoS4UFlb5WQbmdZHVwfCaYMt0cSUbLxhk+C8byMZk=",
+  "Source": "Cookify.Api",
+  "BasePath": "_content/Cookify.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -1,0 +1,15 @@
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\bin\Debug\net6.0\Cookify.Application.deps.json
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\bin\Debug\net6.0\Cookify.Application.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\bin\Debug\net6.0\Cookify.Application.pdb
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\bin\Debug\net6.0\Cookify.Domain.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\bin\Debug\net6.0\Cookify.Domain.pdb
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\obj\Debug\net6.0\Cookify.Application.csproj.AssemblyReference.cache
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\obj\Debug\net6.0\Cookify.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\obj\Debug\net6.0\Cookify.Application.AssemblyInfoInputs.cache
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\obj\Debug\net6.0\Cookify.Application.AssemblyInfo.cs
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\obj\Debug\net6.0\Cookify.Application.csproj.CoreCompileInputs.cache
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\obj\Debug\net6.0\Cookify.Application.csproj.CopyComplete
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\obj\Debug\net6.0\Cookify.Application.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\obj\Debug\net6.0\refint\Cookify.Application.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\obj\Debug\net6.0\Cookify.Application.pdb
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Application\obj\Debug\net6.0\ref\Cookify.Application.dll

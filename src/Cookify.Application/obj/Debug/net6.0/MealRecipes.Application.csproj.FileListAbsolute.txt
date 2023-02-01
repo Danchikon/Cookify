@@ -1,0 +1,15 @@
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\bin\Debug\net6.0\MealRecipes.Application.deps.json
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\bin\Debug\net6.0\MealRecipes.Application.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\bin\Debug\net6.0\MealRecipes.Application.pdb
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\bin\Debug\net6.0\MealRecipes.Domain.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\bin\Debug\net6.0\MealRecipes.Domain.pdb
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\obj\Debug\net6.0\MealRecipes.Application.csproj.AssemblyReference.cache
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\obj\Debug\net6.0\MealRecipes.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\obj\Debug\net6.0\MealRecipes.Application.AssemblyInfoInputs.cache
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\obj\Debug\net6.0\MealRecipes.Application.AssemblyInfo.cs
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\obj\Debug\net6.0\MealRecipes.Application.csproj.CoreCompileInputs.cache
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\obj\Debug\net6.0\MealRecipes.Application.csproj.CopyComplete
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\obj\Debug\net6.0\MealRecipes.Application.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\obj\Debug\net6.0\refint\MealRecipes.Application.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\obj\Debug\net6.0\MealRecipes.Application.pdb
+C:\Users\patik\RiderProjects\MealRecipes\src\MealRecipes.Application\obj\Debug\net6.0\ref\MealRecipes.Application.dll
