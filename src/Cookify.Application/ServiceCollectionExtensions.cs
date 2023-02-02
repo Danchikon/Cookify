@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
     }
     
     public static IServiceCollection AddTransactionPipeline<TCommand, TResponse>(this IServiceCollection services) 
-        where TCommand : ICommand<TResponse>
+        where TCommand : CommandBase<TResponse>
     {
        
         services.AddScoped(

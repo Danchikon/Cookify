@@ -1,10 +1,10 @@
 using System.Net;
 using Cookify.Api.Helpers;
 using Cookify.Api.Middlewares;
-using Cookify.Api.Options;
+using Cookify.Infrastructure.Options;
 using Microsoft.Extensions.Options;
 
-namespace Cookify.Api.Application;
+namespace Cookify.Api.Extensions;
 
 public static class ApplicationBuilderExtensions
 {
@@ -34,7 +34,8 @@ public static class ApplicationBuilderExtensions
 
         var routePrefix = string.IsNullOrWhiteSpace(options.RoutePrefix) ? "swagger" : options.RoutePrefix;
 
-        builder.UseStaticFiles()
+        builder
+            .UseStaticFiles()
             .UseSwagger(swaggerOptions => swaggerOptions.RouteTemplate = routePrefix + "/{documentName}/swagger.json");
 
         return builder.UseSwaggerUI(swaggerUiOptions =>

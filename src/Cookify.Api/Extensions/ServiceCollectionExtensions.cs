@@ -1,20 +1,22 @@
+using System.Text;
 using System.Text.Json.Serialization;
-using Cookify.Api.Options;
 using Cookify.Application.Common.Dtos;
+using Cookify.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-namespace Cookify.Api.Application;
+namespace Cookify.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
-     
-
+        services.AddHttpContextAccessor();
         services.AddApiControllers();
-        services.AddCustomSwagger();
+        services.AddSwagger();
+        services.AddJwtBearerAuthentication();
         
         return services;
     }
@@ -22,7 +24,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApiControllers(this IServiceCollection services)
     {
 
-        services.AddControllers()
+        services
+            .AddControllers()
             .AddJsonOptions(config =>
             {
                 config.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -48,9 +51,46 @@ public static class ServiceCollectionExtensions
         return services;
     }
     
+    #region Authentication
+
+    public static IServiceCollection AddJwtBearerAuthentication(this IServiceCollection services)
+    {
+        AuthenticationOptions options = new();
+        using (var serviceProvider = services.BuildServiceProvider())
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var section = configuration.GetSection(AuthenticationOptions.SectionName);
+            services.Configure<AuthenticationOptions>(section);
+            section.Bind(options);
+        }
+
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(jwtBearerOptions => 
+            {
+                jwtBearerOptions.SaveToken = true;
+                jwtBearerOptions.RequireHttpsMetadata = false;
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidAudience = options.Audience,
+                    ValidIssuer = options.Issuer,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.SecretKey)) 
+                }; 
+            });
+
+        return services;
+    }
+    
+    #endregion
+    
     #region Swagger
 
-    public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
+    public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
         SwaggerOptions options = new();
         using (var serviceProvider = services.BuildServiceProvider())
@@ -61,7 +101,10 @@ public static class ServiceCollectionExtensions
             section.Bind(options);
         }
         
-        if (!options.Enabled) return services;
+        if (!options.Enabled)
+        {
+            return services;
+        }
 
         return services.AddSwaggerGen(c =>
         {

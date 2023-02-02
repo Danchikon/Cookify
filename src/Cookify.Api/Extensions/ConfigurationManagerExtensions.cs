@@ -1,4 +1,4 @@
-namespace Cookify.Api.Application;
+namespace Cookify.Api.Extensions;
 
 public static class ConfigurationManagerExtensions
 {

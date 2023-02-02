@@ -1,8 +1,10 @@
-namespace Cookify.Domain.Common.Exceptions;
+using Cookify.Domain.Common.Exceptions;
+
+namespace Cookify.Domain.Exceptions;
 
 public class NotFoundException : BusinessExceptionBase
 {
-    public NotFoundException(string message): base(message) {}
+    private NotFoundException(string message): base(message) {}
 
     public static NotFoundException Create<T>()
     {

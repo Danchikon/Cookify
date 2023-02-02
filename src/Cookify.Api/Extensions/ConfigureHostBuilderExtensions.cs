@@ -1,6 +1,6 @@
 using Serilog;
 
-namespace Cookify.Api.Application;
+namespace Cookify.Api.Extensions;
 
 public static class ConfigureHostBuilderExtensions
 {

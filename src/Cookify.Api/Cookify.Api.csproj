@@ -16,10 +16,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Cookify.Application\Cookify.Application.csproj" />
+      <ProjectReference Include="..\Cookify.Infrastructure\Cookify.Infrastructure.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Common" />
-    </ItemGroup>
-
 </Project>

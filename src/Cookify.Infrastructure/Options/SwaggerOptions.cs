@@ -1,6 +1,6 @@
-namespace Cookify.Api.Options;
+namespace Cookify.Infrastructure.Options;
 
-public sealed class SwaggerOptions
+public sealed record SwaggerOptions
 {
     public const string SectionName = "Swagger";
     

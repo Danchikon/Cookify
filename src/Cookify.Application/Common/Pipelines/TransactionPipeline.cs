@@ -5,7 +5,7 @@ using MediatR;
 namespace Cookify.Application.Common.Pipelines;
 
 public class TransactionPipeline<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse> 
-    where TCommand : ICommand<TResponse>
+    where TCommand : CommandBase<TResponse>
 {
     private readonly IUnitOfWork _unitOfWork;
 

@@ -35,7 +35,7 @@ public sealed class ErrorHandlerMiddleware
     
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        _logger.LogError("{}", exception.Message);
+        _logger.LogError("{ExceptionMessage}", exception.Message);
         var result = ExceptionToObjectResultConverter.Convert(exception);
 
         await SendResponseAsync(context, result);
