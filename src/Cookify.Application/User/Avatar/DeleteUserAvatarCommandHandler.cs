@@ -1,5 +1,5 @@
 using Cookify.Application.Common.Cqrs;
-using Cookify.Application.Dtos;
+using Cookify.Application.Common.Helpers;
 using Cookify.Application.Services;
 using MediatR;
 
@@ -19,7 +19,7 @@ public class DeleteUserAvatarCommandHandler : ICommandHandler<DeleteUserAvatarCo
     public async Task<Unit> Handle(DeleteUserAvatarCommand command, CancellationToken cancellationToken)
     {
         var userId = _currentUserService.GetUserId();
-        var fileName = $"users/{userId}/avatar"; 
+        var fileName = FileNameFormatter.FormatForUserAvatar(userId); 
         
         await _fileStorageService.RemoveFileAsync(fileName);
 

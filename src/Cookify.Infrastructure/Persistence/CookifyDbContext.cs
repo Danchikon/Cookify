@@ -3,6 +3,8 @@ using Cookify.Domain.Favorite;
 using Cookify.Domain.Ingredient;
 using Cookify.Domain.IngredientRecipe;
 using Cookify.Domain.Like;
+using Cookify.Domain.MealCategory;
+using Cookify.Domain.ProductMarket;
 using Cookify.Domain.Recipe;
 using Cookify.Domain.User;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +20,8 @@ public class CookifyDbContext : DbContext
     public DbSet<IngredientRecipeEntity> IngredientRecipes { get; set; } = null!;
     public DbSet<FavoriteEntity> Favorites { get; set; } = null!;
     public DbSet<LikeEntity> Likes { get; set; } = null!;
+    public DbSet<RecipeCategoryEntity> RecipeCategories { get; set; } = null!;
+    public DbSet<ProductMarketEntity> ProductMarkets { get; set; } = null!;
 
     public CookifyDbContext(DbContextOptions<CookifyDbContext> dbContextOptions) : base(dbContextOptions)
     {

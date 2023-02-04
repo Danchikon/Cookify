@@ -1,9 +1,11 @@
+using System.IO.Compression;
 using System.Text;
 using System.Text.Json.Serialization;
 using Cookify.Application.Common.Dtos;
 using Cookify.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -17,7 +19,8 @@ public static class ServiceCollectionExtensions
         services.AddApiControllers();
         services.AddSwagger();
         services.AddJwtBearerAuthentication();
-        
+        services.AddCompression();
+
         return services;
     }
     
@@ -50,6 +53,32 @@ public static class ServiceCollectionExtensions
         
         return services;
     }
+
+    #region Compression
+
+    public static IServiceCollection AddCompression(this IServiceCollection services)
+    {
+        services.AddResponseCompression(options =>
+        {
+            options.EnableForHttps = true;
+            options.Providers.Add<BrotliCompressionProvider>();
+            options.Providers.Add<GzipCompressionProvider>();
+        });
+
+        services.Configure<BrotliCompressionProviderOptions>(options =>
+        {
+            options.Level = CompressionLevel.Fastest;
+        });
+
+        services.Configure<GzipCompressionProviderOptions>(options =>
+        {
+            options.Level = CompressionLevel.SmallestSize;
+        });
+        
+        return services;
+    }
+
+    #endregion
     
     #region Authentication
 
@@ -97,7 +126,7 @@ public static class ServiceCollectionExtensions
         {
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             var section = configuration.GetSection(SwaggerOptions.SectionName);
-            services.Configure<SwaggerOptions>(section);
+            services.Configure<SwaggerOptions>(section, binderOptions => binderOptions.ErrorOnUnknownConfiguration = true);
             section.Bind(options);
         }
         

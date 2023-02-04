@@ -1,10 +1,7 @@
 using Cookify.Application.Common.Cqrs;
 using Cookify.Application.Dtos;
+using Cookify.Application.Dtos.Authentication;
 
 namespace Cookify.Application.User.Authentication;
 
-public record AuthenticateUserCommand : CommandBase<JsonWebTokenDto>
-{
-    public string Username { get; init; }
-    public string Password { get; init; }
-}
+public record AuthenticateUserCommand(string Username, string Password) : CommandBase<JsonWebTokenDto>;

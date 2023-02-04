@@ -1,4 +1,4 @@
-using Cookify.Api.Helpers;
+using Cookify.Api.Common.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
@@ -35,7 +35,7 @@ public sealed class ErrorHandlerMiddleware
     
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        _logger.LogError("{ExceptionMessage}", exception.Message);
+        _logger.LogError("{Message} {StackTrace}", exception.Message, exception.StackTrace);
         var result = ExceptionToObjectResultConverter.Convert(exception);
 
         await SendResponseAsync(context, result);

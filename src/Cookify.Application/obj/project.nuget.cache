@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "1O0uvsGh20qGwFeCIN1vri1v75YCnsu6DkM9WAvaRxOLE6+M9beOCi/E5TG60Ut0vvBSTL97G7+SmIk4N7+fYg==",
+  "dgSpecHash": "GeDVgmeTV8F9CHV/P9fFzLg1wEcbC2Tr2nnHkH2R7dW1vyuRMa1+l/rCoxgYzOTq3A8uNkbIdhhBBMjUS8TbuQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\patik\\RiderProjects\\MealRecipes\\src\\Cookify.Application\\Cookify.Application.csproj",
   "expectedPackageFiles": [
@@ -13,7 +13,11 @@
     "C:\\Users\\patik\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\6.0.0\\microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512",
     "C:\\Users\\patik\\.nuget\\packages\\microsoft.extensions.options\\6.0.0\\microsoft.extensions.options.6.0.0.nupkg.sha512",
     "C:\\Users\\patik\\.nuget\\packages\\microsoft.extensions.primitives\\6.0.0\\microsoft.extensions.primitives.6.0.0.nupkg.sha512",
-    "C:\\Users\\patik\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+    "C:\\Users\\patik\\.nuget\\packages\\refit\\6.3.2\\refit.6.3.2.nupkg.sha512",
+    "C:\\Users\\patik\\.nuget\\packages\\system.net.http.json\\6.0.0\\system.net.http.json.6.0.0.nupkg.sha512",
+    "C:\\Users\\patik\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\patik\\.nuget\\packages\\system.text.encodings.web\\6.0.0\\system.text.encodings.web.6.0.0.nupkg.sha512",
+    "C:\\Users\\patik\\.nuget\\packages\\system.text.json\\6.0.0\\system.text.json.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }

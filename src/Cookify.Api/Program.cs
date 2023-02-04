@@ -1,7 +1,7 @@
-using Cookify.Api;
 using Cookify.Api.Extensions;
 using Cookify.Application;
 using Cookify.Infrastructure;
+using Cookify.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,16 +15,29 @@ builder.Services.AddInfrastructureServices();
 
 var app = builder.Build();
 
+await app.UseDatabaseAsync<CookifyDbContext>();
+
 app.UseErrorHandlerMiddleware();
+
+app.UseResponseCompression();
+
+app.UseCors(configurePolicy => 
+    {
+        configurePolicy.AllowAnyOrigin();
+        configurePolicy.AllowAnyHeader();
+        configurePolicy.AllowAnyMethod();
+    }
+);
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-}
+app.UseSwagger();
 
 app.MapControllers();
 
 await app.RunAsync();
+
+
+
+var Бандера = new {};

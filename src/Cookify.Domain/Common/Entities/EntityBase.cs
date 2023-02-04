@@ -3,7 +3,7 @@ namespace Cookify.Domain.Common.Entities;
 public abstract class BaseEntity : IUserTrackableEntity
 {
     public Guid Id { get; init; }
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset CreatedAt { get; set; }
     public Guid? CreatedBy { get; init; }
     public DateTimeOffset? UpdatedAt { get; set; }
     public Guid? UpdatedBy { get; set; }

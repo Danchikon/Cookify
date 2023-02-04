@@ -2,6 +2,7 @@ using System.Net.Mime;
 using AutoMapper;
 using Cookify.Api.Common.Controllers;
 using Cookify.Application.Dtos;
+using Cookify.Application.Dtos.Authentication;
 using Cookify.Application.User.Authentication;
 using Cookify.Application.User.Avatar;
 using MediatR;
@@ -11,8 +12,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Cookify.Api.Controllers;
 
-[ApiController]
-[Route("users")]
+[Route("api/users")]
 public class UsersController : ApiControllerBase
 {
     public UsersController(IMediator mediator, IMapper mapper) : base(mediator, mapper)
@@ -21,7 +21,6 @@ public class UsersController : ApiControllerBase
     
     [HttpPost("authentication")]
     [Consumes(MediaTypeNames.Application.Json)]
-    [Produces(MediaTypeNames.Application.Json)]
     [SwaggerOperation(
         Summary = "Authenticates user",
         Description = "Requires already registered user",
@@ -38,7 +37,6 @@ public class UsersController : ApiControllerBase
     
     [HttpPost("registration")]
     [Consumes(MediaTypeNames.Application.Json)]
-    [Produces(MediaTypeNames.Application.Json)]
     [SwaggerOperation(
         Summary = "Registers user",
         Description = "Registers user",

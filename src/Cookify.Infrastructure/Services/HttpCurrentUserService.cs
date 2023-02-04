@@ -22,8 +22,8 @@ public class HttpCurrentUserService : ICurrentUserService
         if (string.IsNullOrWhiteSpace(authorizationHeader))
         {
             throw UnauthorizedException.Create();
-        }
-
+        } 
+        
         var jsonWebToken = authorizationHeader.Split(' ').Last();
         var claims = _authenticationService.GetClaimsPrincipal(jsonWebToken)?.Claims;
         var userIdString = claims?.Single(claim => claim.Type == "userId").Value;

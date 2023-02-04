@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Cookify.Domain.Common.Entities;
-using Cookify.Domain.Common.Exceptions;
 using Cookify.Domain.Common.Pagination;
 using Cookify.Domain.Common.Repositories;
 using Cookify.Domain.Exceptions;
@@ -15,28 +14,33 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
     where TEntity : class, IEntity<Guid>, new()
     where TContext : DbContext
 {
-    private readonly TContext _dbContext;
-    private readonly IMapper _mapper;
+    protected readonly TContext DbContext;
+    protected readonly IMapper Mapper;
 
     public EfRepository(TContext dbContext, IMapper mapper)
     {
-        _dbContext = dbContext;
-        _mapper = mapper;
+        DbContext = dbContext;
+        Mapper = mapper;
     }
     
     public virtual async Task<Guid> AddAsync(TEntity entity)
     {
-        var result = await _dbContext.Set<TEntity>().AddAsync(entity);
+        var result = await DbContext.Set<TEntity>().AddAsync(entity);
         return result.Entity.Id;
+    }
+
+    public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities)
+    {
+        await DbContext.Set<TEntity>().AddRangeAsync(entities);
     }
 
     public virtual ValueTask PartiallyUpdateAsync(Guid id, PartialEntity<TEntity> partialEntity)
     {
         TEntity entity = new() { Id = id };
         
-        _dbContext.Set<TEntity>().Attach(entity);
+        DbContext.Set<TEntity>().Attach(entity);
         
-        var references = _dbContext.Entry(entity)
+        var references = DbContext.Entry(entity)
                 .References
                 .Select(x => x.Metadata.Name)
                 .ToHashSet();
@@ -47,11 +51,11 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
 
             if (references.Contains(property.Name))
             {
-                _dbContext.Entry(entity).Reference(property.Name).IsModified = true;
+                DbContext.Entry(entity).Reference(property.Name).IsModified = true;
             }
             else
             {
-                _dbContext.Entry(entity).Property(property.Name).IsModified = true;
+                DbContext.Entry(entity).Property(property.Name).IsModified = true;
             }
         }
         
@@ -60,7 +64,7 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
 
     public virtual ValueTask UpdateAsync(TEntity entity)
     {
-        _dbContext.Set<TEntity>().Update(entity);
+        DbContext.Set<TEntity>().Update(entity);
         
         return ValueTask.CompletedTask;
     }
@@ -68,8 +72,8 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
     public virtual ValueTask RemoveAsync(Guid id)
     {
         TEntity entity = new() { Id = id };
-        _dbContext.Set<TEntity>().Attach(entity);
-        _dbContext.Set<TEntity>().Remove(entity);
+        DbContext.Set<TEntity>().Attach(entity);
+        DbContext.Set<TEntity>().Remove(entity);
         
         return ValueTask.CompletedTask;
     }
@@ -86,12 +90,12 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
         return entity;
     }
 
-    public async Task<TEntity> FirstAsync(Guid id)
+    public virtual async Task<TEntity> FirstAsync(Guid id)
     {
         return await FirstAsync(entity => entity.Id == id);
     }
 
-    public async Task<TModel> FirstAsync<TModel>(Expression<Func<TEntity, bool>>? expression = null)
+    public virtual async Task<TModel> FirstAsync<TModel>(Expression<Func<TEntity, bool>>? expression = null)
     {
         var entity = await FirstOrDefaultAsync<TModel>(expression);
 
@@ -103,17 +107,17 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
         return entity;
     }
 
-    public async Task<TModel> FirstAsync<TModel>(Guid id)
+    public virtual async Task<TModel> FirstAsync<TModel>(Guid id)
     {
         return await FirstAsync<TModel>(entity => entity.Id == id);
     }
 
     public virtual async Task<TModel?> FirstOrDefaultAsync<TModel>(Expression<Func<TEntity, bool>>? expression = null)
     {
-        var entity = await _dbContext.Set<TEntity>()
+        var entity = await DbContext.Set<TEntity>()
             .AsNoTracking()
             .Where(expression ?? (_ => true))
-            .ProjectTo<TModel>(_mapper.ConfigurationProvider)
+            .ProjectTo<TModel>(Mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
 
         return entity;
@@ -126,7 +130,7 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
 
     public virtual async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? expression = null)
     {
-        var entity = await _dbContext.Set<TEntity>()
+        var entity = await DbContext.Set<TEntity>()
             .AsNoTracking()
             .FirstOrDefaultAsync(expression ?? (_ => true));
 
@@ -138,26 +142,9 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
         return await FirstOrDefaultAsync(entity => entity.Id == id);
     }
 
-    public virtual async Task<List<TModel>> WhereAsync<TModel>(Expression<Func<TEntity, bool>>? expression = null)
+    public virtual async Task<List<TModel>> WhereAsync<TModel>(params Expression<Func<TEntity, bool>>[]? expressions)
     {
-        var entities = await _dbContext.Set<TEntity>()
-            .AsNoTracking()
-            .Where(expression ?? (_ => true))
-            .ProjectTo<TModel>(_mapper.ConfigurationProvider)
-            .ToListAsync();
-
-        return entities;
-
-    }
-
-    public virtual async Task<IPaginatedList<TModel>> PaginateAsync<TModel>(
-        uint currentPage, 
-        uint pageSize,
-        uint offset = 0,
-        Expression<Func<TEntity, bool>>[]? expressions = null
-        )
-    {
-        var entities = _dbContext.Set<TEntity>().AsNoTracking();
+        var entities = DbContext.Set<TEntity>().AsNoTracking();
 
         if (expressions is not null)
         {
@@ -165,8 +152,45 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
         }
 
         return await entities
-            .ProjectTo<TModel>(_mapper.ConfigurationProvider)
-            .PaginateByPageSizeAsync(currentPage, pageSize, offset);
+            .ProjectTo<TModel>(Mapper.ConfigurationProvider)
+            .ToListAsync();
+    }
+
+    public virtual async Task<List<TEntity>> WhereAsync(params Expression<Func<TEntity, bool>>[]? expressions)
+    {
+        var entities = DbContext.Set<TEntity>().AsNoTracking();
+
+        if (expressions is not null)
+        {
+            entities = expressions.Aggregate(entities, (queryable, expression) => queryable.Where(expression));
+        }
+
+        return await entities.ToListAsync();
+    }
+
+    public virtual async Task<IPaginatedList<TModel>> PaginateAsync<TModel>(
+        uint page, 
+        uint pageSize,
+        uint offset = 0,
+        ICollection<Expression<Func<TEntity, object>>>? includes = null,
+        ICollection<Expression<Func<TEntity, bool>>>? expressions = null
+        )
+    {
+        var entities = DbContext.Set<TEntity>().AsNoTracking();
+
+        if (expressions is not null)
+        {
+            entities = expressions.Aggregate(entities, (queryable, expression) => queryable.Where(expression));
+        }
+        
+        if (includes is not null)
+        {
+            entities = includes.Aggregate(entities, (queryable, include) => queryable.Include(include));
+        }
+
+        return await entities
+            .ProjectTo<TModel>(Mapper.ConfigurationProvider)
+            .PaginateByPageSizeAsync(page, pageSize, offset);
     }
 
     public virtual async Task<bool> AnyAsync(Guid id)
@@ -176,6 +200,6 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
 
     public virtual async Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? expression = null)
     {
-        return await _dbContext.Set<TEntity>().AnyAsync(expression ?? (_ => true));
+        return await DbContext.Set<TEntity>().AnyAsync(expression ?? (_ => true));
     }
 }

@@ -10,9 +10,14 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
     {
         builder.HasKey(user => user.Id);
         
+        builder.HasQueryFilter(user => user.IsActive);
+
+        #region Properties
+
         builder
             .Property(user => user.CreatedAt)
-            .IsRequired();
+            .IsRequired()
+            .HasDefaultValue(DateTimeOffset.UtcNow);;;
         
         builder
             .Property(user => user.IsActive)
@@ -21,20 +26,43 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
         builder
             .Property(user => user.Username)
             .IsRequired()
-            .HasMaxLength(42);
-
+            .HasMaxLength(50);
+        
+        builder
+            .Property(user => user.Email)
+            .IsRequired()
+            .HasMaxLength(50);
+        
         builder
             .Property(user => user.PasswordHash)
             .IsRequired();
         
-        builder.HasQueryFilter(user => user.IsActive);
+        builder
+            .Property(user => user.AvatarImageLink)
+            .HasDefaultValue(null);
         
+        #endregion
+
+        #region Indexes
+
+        builder
+            .HasIndex(user => user.Username)
+            .IsUnique();
+        
+        builder
+            .HasIndex(user => user.Email)
+            .IsUnique();
+        
+        #endregion
+
+        #region Relations
+
         builder
             .HasMany(user => user.Likes)
             .WithOne(like => like.User)
             .HasForeignKey(like => like.CreatedBy)
             .IsRequired();
-
+        
         builder
             .HasMany(user => user.Favorites)
             .WithOne(favorite => favorite.User)
@@ -46,8 +74,6 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
             .WithOne(recipe => recipe.User)
             .HasForeignKey(recipe => recipe.CreatedBy);
         
-        builder
-            .HasIndex(user => user.Username)
-            .IsUnique();
+        #endregion
     }
 }

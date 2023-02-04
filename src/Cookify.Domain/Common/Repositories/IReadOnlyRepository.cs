@@ -25,17 +25,19 @@ public interface IReadOnlyRepository<TEntity>
 
     #region WhereAsync
 
-    Task<List<TModel>> WhereAsync<TModel>(Expression<Func<TEntity, bool>>? expression = null);
-
+    Task<List<TModel>> WhereAsync<TModel>(params Expression<Func<TEntity, bool>>[]? expressions);
+    Task<List<TEntity>> WhereAsync(params Expression<Func<TEntity, bool>>[]? expressions);
+    
     #endregion
         
     #region PaginateAsync
 
     Task<IPaginatedList<TModel>> PaginateAsync<TModel>(
-        uint currentPage,
+        uint page,
         uint pageSize,
         uint offset = 0,
-        params Expression<Func<TEntity, bool>>[]? expressions
+        ICollection<Expression<Func<TEntity, object>>>? includes = null,
+        ICollection<Expression<Func<TEntity, bool>>>? expressions = null
     );
 
     #endregion

@@ -10,6 +10,10 @@ public class FavoriteEntity : BaseEntity
     public RecipeEntity Recipe { get; set; } = null!;
     public UserEntity User { get; set; } = null!;
 
+    public FavoriteEntity()
+    {
+        
+    }
     public FavoriteEntity(RecipeEntity recipe, UserEntity user)
     {
         Recipe = recipe;

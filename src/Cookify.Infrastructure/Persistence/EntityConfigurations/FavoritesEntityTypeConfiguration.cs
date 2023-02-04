@@ -9,24 +9,35 @@ public class FavoriteEntityTypeConfiguration : IEntityTypeConfiguration<Favorite
 {
     public void Configure(EntityTypeBuilder<FavoriteEntity> builder)
     {
-        builder.HasKey(user => user.Id);
+        builder.HasKey(favorite => favorite.Id);
         
-        builder
-            .Property(user => user.CreatedAt)
-            .IsRequired();
-        
-        builder
-            .Property(user => user.IsActive)
-            .IsRequired();
+        builder.HasQueryFilter(favorite => favorite.IsActive);
 
-        builder.HasQueryFilter(user => user.IsActive);
-        
-        builder
-            .HasOne(like => like.Recipe)
-            .WithMany(recipe => recipe.Favorites);
+        #region Properties
 
         builder
-            .HasOne(like => like.User)
-            .WithMany(user => user.Favorites);
+            .Property(favorite => favorite.CreatedAt)
+            .IsRequired()
+            .HasDefaultValue(DateTimeOffset.UtcNow);;
+        
+        builder
+            .Property(favorite => favorite.IsActive)
+            .IsRequired();
+        
+        #endregion
+
+        #region Relations
+
+        builder
+            .HasOne(favorite => favorite.Recipe)
+            .WithMany(recipe => recipe.Favorites)
+            .HasForeignKey(favorite => favorite.RecipeId);
+
+        builder
+            .HasOne(favorite => favorite.User)
+            .WithMany(user => user.Favorites)
+            .HasForeignKey(favorite => favorite.RecipeId);
+        
+        #endregion
     }
 }

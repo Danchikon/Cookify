@@ -1,6 +1,4 @@
-using Cookify.Domain.Favorite;
 using Cookify.Domain.Ingredient;
-using Cookify.Domain.Like;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,20 +8,50 @@ public class IngredientEntityTypeConfiguration : IEntityTypeConfiguration<Ingred
 {
     public void Configure(EntityTypeBuilder<IngredientEntity> builder)
     {
-        builder.HasKey(user => user.Id);
+        builder.HasKey(ingredient => ingredient.Id);
         
-        builder
-            .Property(user => user.CreatedAt)
-            .IsRequired();
-        
-        builder
-            .Property(user => user.IsActive)
-            .IsRequired();
+        builder.HasQueryFilter(ingredient => ingredient.IsActive);
 
-        builder.HasQueryFilter(user => user.IsActive);
+        #region Properties
+
+        builder
+            .Property(ingredient => ingredient.CreatedAt)
+            .IsRequired()
+            .HasDefaultValue(DateTimeOffset.UtcNow);
         
         builder
-            .HasMany(ingredient => ingredient.Recipes)
-            .WithMany(recipe => recipe.Ingredients);
+            .Property(ingredient => ingredient.IsActive)
+            .IsRequired();
+        
+        builder
+            .Property(ingredient => ingredient.Name)
+            .IsRequired()
+            .HasMaxLength(150);
+        
+        builder
+            .Property(ingredient => ingredient.UkrainianName)
+            .IsRequired()
+            .HasMaxLength(150);
+        
+        builder
+            .Property(ingredient => ingredient.Description)
+            .HasMaxLength(4000)
+            .HasDefaultValue(null);
+        
+        builder
+            .Property(ingredient => ingredient.ImageLink)
+            .HasDefaultValue(null);
+        
+        #endregion
+
+        builder
+            .HasIndex(ingredient => ingredient.Name)
+            .IsUnique();
+
+        builder
+            .HasMany(ingredient => ingredient.IngredientRecipes)
+            .WithOne(ingredientRecipe => ingredientRecipe.Ingredient)
+            .HasForeignKey(ingredientRecipe => ingredientRecipe.IngredientId)
+            .IsRequired();
     }
 }

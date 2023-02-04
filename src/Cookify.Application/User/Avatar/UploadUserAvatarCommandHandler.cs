@@ -1,4 +1,5 @@
 using Cookify.Application.Common.Cqrs;
+using Cookify.Application.Common.Helpers;
 using Cookify.Application.Dtos;
 using Cookify.Application.Models;
 using Cookify.Application.Services;
@@ -19,7 +20,7 @@ public class UploadUserAvatarCommandHandler : ICommandHandler<UploadUserAvatarCo
     public async Task<string> Handle(UploadUserAvatarCommand command, CancellationToken cancellationToken)
     {
         var userId = _currentUserService.GetUserId();
-        var fileName = $"users/{userId}/avatar"; 
+        var fileName = FileNameFormatter.FormatForUserAvatar(userId);
         
         var avatarLink = await _fileStorageService.PutFileAsync(new FileModel(
             command.FileStream, 

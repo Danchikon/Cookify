@@ -1,26 +1,36 @@
 using Cookify.Domain.Common.Entities;
-using Cookify.Domain.Ingredient.Enums;
-using Cookify.Domain.Recipe;
+using Cookify.Domain.IngredientRecipe;
 
 namespace Cookify.Domain.Ingredient;
 
 public class IngredientEntity : BaseEntity
 {
-    public string Title { get; set; }
-    public IngredientType Type { get; set; }
-    public string Description { get; set; }
+    public string Name { get; set; } = null!;
+    public string UkrainianName { get; set; } = null!;
+    public string? Description { get; set; }
+    public string? UkrainianDescription { get; set; }
+    public string? ImageLink { get; set; } 
 
-    public ICollection<RecipeEntity> Recipes { get; set; } = Array.Empty<RecipeEntity>();
+    public ICollection<IngredientRecipeEntity> IngredientRecipes { get; set; } = Array.Empty<IngredientRecipeEntity>();
 
+    public IngredientEntity() 
+    {
+        
+    }
+    
     public IngredientEntity(
-        string title, 
-        IngredientType type, 
-        string description,
-        Guid createdBy
+        string name, 
+        string ukrainianName,
+        string? imageLink = null,
+        string? description = null,
+        string? ukrainianDescription = null,
+        Guid? createdBy = null
     ) : base(createdBy)
     {
-        Title = title;
-        Type = type;
+        Name = name;
+        UkrainianName = ukrainianName;
+        ImageLink = imageLink;
         Description = description;
+        UkrainianDescription = ukrainianDescription;
     }
 }

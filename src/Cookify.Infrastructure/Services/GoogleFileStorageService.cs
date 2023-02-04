@@ -9,42 +9,64 @@ namespace Cookify.Infrastructure.Services;
 
 public class GoogleFileStorageService : IFileStorageService
 {
+    private static readonly SemaphoreSlim SemaphoreSlim = new(5);
+    
     private readonly GoogleStorageOptions _options;
-    private readonly StorageClient _storageClient;
+    private readonly Lazy<StorageClient> _storageClient;
+    private readonly ILogger<GoogleFileStorageService> _logger;
 
-    public GoogleFileStorageService(StorageClient storageClient, IOptions<GoogleStorageOptions> options)
+    public GoogleFileStorageService(
+        Lazy<StorageClient> storageClient, 
+        IOptions<GoogleStorageOptions> options,
+        ILogger<GoogleFileStorageService> logger
+        )
     {
         _storageClient = storageClient;
         _options = options.Value;
+        _logger = logger;
     }
 
     public async Task<string> PutFileAsync(FileModel file)
     {
-        var uploadedFile = await _storageClient.UploadObjectAsync(
-            _options.Bucket,
-            file.Name,
-            file.ContentType,
-            file.Stream
-        );
-
-        return $"{_options.Url}/{_options.Bucket}/{uploadedFile.Name}";
+        try
+        {
+            await SemaphoreSlim.WaitAsync();
+            
+            _logger.LogInformation("Putting {FileName} file into google storage", file.Name);
+            
+            var uploadedFile = await _storageClient.Value.UploadObjectAsync(
+                _options.Bucket,
+                file.Name,
+                file.ContentType,
+                file.Stream
+            );
+            
+            _logger.LogInformation("File {FileName} putted into google storage", file.Name);
+            
+            
+            return GetFileLink(uploadedFile.Name);
+        }
+        finally
+        {
+            SemaphoreSlim.Release();
+        }
     }
 
     public string GetFileLink(string fileName)
     {
         return $"{_options.Url}/{_options.Bucket}/{fileName}";
     }
-    
+
     public async Task<FileModel> GetFileAsync(string fileName)
     {
         var stream = new MemoryStream();
-        var file = await _storageClient.DownloadObjectAsync(_options.Bucket, fileName, stream);
+        var file = await _storageClient.Value.DownloadObjectAsync(_options.Bucket, fileName, stream);
 
         return new FileModel(stream, file.ContentType, file.Name);
     }
 
     public async Task RemoveFileAsync(string fileName)
     {
-        await _storageClient.DeleteObjectAsync(_options.Bucket, fileName);
+        await _storageClient.Value.DeleteObjectAsync(_options.Bucket, fileName);
     }
 }

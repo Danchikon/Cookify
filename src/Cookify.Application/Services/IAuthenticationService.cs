@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Cookify.Application.Dtos;
+using Cookify.Application.Dtos.Authentication;
 using Cookify.Domain.User;
 
 namespace Cookify.Application.Services;

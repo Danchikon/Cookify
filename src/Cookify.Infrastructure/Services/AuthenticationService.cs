@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Cookify.Application.Dtos;
+using Cookify.Application.Dtos.Authentication;
 using Cookify.Application.Services;
 using Cookify.Domain.User;
 using Cookify.Infrastructure.Options;

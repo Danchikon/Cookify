@@ -4,8 +4,8 @@ public sealed record AuthenticationOptions
 {
     public const string SectionName = "Authentication";
     
-    public string? Issuer { get; init; } 
-    public string? Audience { get; init; } 
-    public string? SecretKey { get; init; } 
+    public string Issuer { get; init; } = null!;
+    public string Audience { get; init; } = null!;
+    public string SecretKey { get; init; } = null!;
     public uint Lifetime { get; init; }
 }

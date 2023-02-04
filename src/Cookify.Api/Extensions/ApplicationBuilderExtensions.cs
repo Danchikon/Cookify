@@ -1,7 +1,9 @@
 using System.Net;
-using Cookify.Api.Helpers;
+using Cookify.Api.Common.Helpers;
 using Cookify.Api.Middlewares;
+using Cookify.Infrastructure.Common.Seeders;
 using Cookify.Infrastructure.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Cookify.Api.Extensions;
@@ -46,4 +48,33 @@ public static class ApplicationBuilderExtensions
     }
     
     #endregion
+    
+    public static async Task<IApplicationBuilder> UseDatabaseAsync<TDbContext>(this IApplicationBuilder builder) where TDbContext : DbContext
+    {
+        var options = builder.ApplicationServices.GetRequiredService<IOptions<EfDatabaseOptions>>().Value;
+        var serviceScopeFactory = builder.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+        await using var serviceScope = serviceScopeFactory.CreateAsyncScope();
+        await using var dbContext = serviceScope.ServiceProvider.GetRequiredService<TDbContext>();
+
+        var seeders = serviceScope.ServiceProvider.GetServices<SeederBase>();
+
+        if (options.MigratingEnabled)
+        {
+            await dbContext.Database.MigrateAsync();
+        }
+
+        if (!options.SeedingEnabled)
+        {
+            return builder;
+        }
+        
+        foreach (var seeder in seeders)
+        {
+            await seeder.SeedAsync();
+        }
+
+        return builder;
+    }
+    
+    
 }

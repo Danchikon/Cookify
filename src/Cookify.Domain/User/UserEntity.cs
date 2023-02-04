@@ -9,12 +9,13 @@ public class UserEntity : IEntity<Guid>
 {
     public Guid Id { get; init; }
     public bool IsActive { get; set; }
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }
 
     public string Username { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
+    public string? AvatarImageLink { get; set; }
 
     public ICollection<FavoriteEntity> Favorites { get; set; } = Array.Empty<FavoriteEntity>();
     public ICollection<LikeEntity> Likes { get; set; } = Array.Empty<LikeEntity>();
@@ -25,11 +26,12 @@ public class UserEntity : IEntity<Guid>
         
     }
     
-    private UserEntity(string username, string passwordHash)
+    public UserEntity(string username, string email, string passwordHash)
     {
         Id = Guid.NewGuid();
         CreatedAt = DateTimeOffset.UtcNow;
         Username = username;
         PasswordHash = passwordHash;
+        Email = email;
     }
 }

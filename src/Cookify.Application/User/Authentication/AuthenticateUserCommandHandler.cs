@@ -1,5 +1,6 @@
 using Cookify.Application.Common.Cqrs;
 using Cookify.Application.Dtos;
+using Cookify.Application.Dtos.Authentication;
 using Cookify.Application.Services;
 using Cookify.Domain.Exceptions;
 using Cookify.Domain.User;
@@ -31,11 +32,10 @@ public class AuthenticateUserCommandHandler : ICommandHandler<AuthenticateUserCo
         //     throw NotAuthenticatedException.Create(command.Username);
         // }
 
-        return _authenticationService.AuthenticateUser(new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            Username = "Daniel",
-            Email = "patikotmot@gmail.com"
-        });
+        return _authenticationService.AuthenticateUser(new UserEntity(
+            "Daniel", 
+            "patikotmot@gmail.com", 
+            "fefevew"
+            ));
     }
 }

@@ -1,5 +1,4 @@
 using Cookify.Application.Common.Cqrs;
-using Cookify.Application.Models;
 
 namespace Cookify.Application.User.Avatar;
 

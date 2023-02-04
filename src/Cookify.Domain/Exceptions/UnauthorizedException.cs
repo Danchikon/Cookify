@@ -10,6 +10,6 @@ public class UnauthorizedException : BusinessExceptionBase
     
     public static UnauthorizedException Create()
     {
-        return new("Unauthorized");
+        return new UnauthorizedException("Unauthorized");
     }
 }

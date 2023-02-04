@@ -3,13 +3,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Cookify.Infrastructure.Options;
 
-public sealed class GoogleStorageOptions
+public sealed record GoogleStorageOptions
 {
     public const string SectionName = "GoogleStorage";
-    
-    public string? Url { get; init; }
-    
-    public string? ProjectId { get; init; }
-    public string? CredentialFileJson { get; init; } 
-    public string? Bucket { get; init; }
+
+    public string Url { get; init; } = null!;
+    public string CredentialFileJson { get; init; } = null!;
+    public string Bucket { get; init; } = null!;
 }

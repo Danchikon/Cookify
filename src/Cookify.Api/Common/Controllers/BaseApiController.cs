@@ -10,6 +10,7 @@ namespace Cookify.Api.Common.Controllers;
 [ApiController]
 [Produces(MediaTypeNames.Application.Json)]
 [SwaggerResponse(StatusCodes.Status400BadRequest, "Bad request", typeof(ErrorDto))]
+[SwaggerResponse(StatusCodes.Status415UnsupportedMediaType, "Unsupported media type", typeof(ErrorDto))]
 [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error", typeof(ErrorDto))]
 public abstract class ApiControllerBase : ControllerBase
 {
