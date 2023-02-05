@@ -15,6 +15,8 @@ public class RecipeEntity : BaseEntity
     public string Instruction { get; set; } = null!;
     public string UkrainianInstruction { get; set; } = null!;
     public string? ImageLink { get; set; } 
+    public string? PdfLink { get; set; } 
+    public string? UkrainianPdfLink { get; set; } 
 
     public UserEntity? User { get; set; }
     public Guid CategoryId { get; set; }

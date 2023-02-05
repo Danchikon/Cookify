@@ -3,7 +3,6 @@ using AutoMapper;
 using Cookify.Api.Common.Controllers;
 using Cookify.Application.Common.Dtos;
 using Cookify.Application.Dtos.RecipeCategory;
-using Cookify.Application.MealCategory;
 using Cookify.Application.RecipeCategory;
 using Cookify.Domain.Common.Pagination;
 using MediatR;

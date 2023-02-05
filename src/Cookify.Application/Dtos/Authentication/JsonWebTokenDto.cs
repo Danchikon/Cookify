@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Cookify.Application.Dtos.Authentication;
 
 public record JsonWebTokenDto

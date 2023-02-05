@@ -1,3 +1,5 @@
+using Cookify.Application.Common.Constants;
+using Cookify.Application.Dtos.Authentication;
 using Cookify.Application.Services;
 using Cookify.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +19,7 @@ public class HttpCurrentUserService : ICurrentUserService
     
     public Guid GetUserId()
     {
-        var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.Single();
+        var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.SingleOrDefault();
 
         if (string.IsNullOrWhiteSpace(authorizationHeader))
         {
@@ -26,7 +28,7 @@ public class HttpCurrentUserService : ICurrentUserService
         
         var jsonWebToken = authorizationHeader.Split(' ').Last();
         var claims = _authenticationService.GetClaimsPrincipal(jsonWebToken)?.Claims;
-        var userIdString = claims?.Single(claim => claim.Type == "userId").Value;
+        var userIdString = claims?.Single(claim => claim.Type == UserClaimsConstants.UserId).Value;
 
         if (string.IsNullOrWhiteSpace(userIdString) || !Guid.TryParse(userIdString, out var userId))
         {

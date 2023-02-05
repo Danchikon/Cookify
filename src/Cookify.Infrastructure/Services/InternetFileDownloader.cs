@@ -22,7 +22,7 @@ public class InternetFileDownloaderService : IInternetFileDownloaderService
         try
         {
             await SemaphoreSlim.WaitAsync();
-            
+
             _logger.LogInformation("Downloading {Url}", path.ToString());
             
             var fileBytes = await _webClient.DownloadDataTaskAsync(path);

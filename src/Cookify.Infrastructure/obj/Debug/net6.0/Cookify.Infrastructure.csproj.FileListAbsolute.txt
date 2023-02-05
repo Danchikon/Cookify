@@ -1,4 +1,6 @@
 C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Infrastructure\bin\Debug\net6.0\Persistence\Migrations\SqlScripts\QuartzDbMigration.sql
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Infrastructure\bin\Debug\net6.0\Common\PdfTemplates\recipePdf.handlebars
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Infrastructure\bin\Debug\net6.0\Common\PdfTemplates\recipeUkrainianPdf.handlebars
 C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Infrastructure\bin\Debug\net6.0\Cookify.Infrastructure.deps.json
 C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Infrastructure\bin\Debug\net6.0\Cookify.Infrastructure.dll
 C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Infrastructure\bin\Debug\net6.0\Cookify.Infrastructure.pdb

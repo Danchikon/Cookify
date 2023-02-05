@@ -4,8 +4,10 @@ using Cookify.Api.Common.Controllers;
 using Cookify.Application.Common.Dtos;
 using Cookify.Application.Dtos.Ingredient;
 using Cookify.Application.Ingredient;
+using Cookify.Application.Ingredient.User;
 using Cookify.Domain.Common.Pagination;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -30,6 +32,42 @@ public class IngredientsController : ApiControllerBase
     public async Task<IActionResult> GetIngredientAsync([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         return Ok(await Mediator.Send(new GetIngredientQuery(id), cancellationToken));
+    }
+    
+    [Authorize]
+    [HttpPut("{id:guid}/users/current")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [SwaggerOperation(
+        Summary = "Creates or updates ingredient user for current user",
+        Description = "Requires authenticated user",
+        OperationId = nameof(CreateOrUpdateIngredientUserAsync)
+    )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, "Ingredient user for current user has been successfully created or updated")]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Ingredient not found", typeof(ErrorDto))]
+    public async Task<IActionResult> CreateOrUpdateIngredientUserAsync(
+        [FromRoute] Guid id,
+        [FromBody, SwaggerRequestBody(Required = true)] string ukrainianMeasure, 
+        CancellationToken cancellationToken
+        )
+    {
+        await Mediator.Send(new CreateOrUpdateIngredientUserCommand(id, ukrainianMeasure), cancellationToken);
+        return NoContent();
+    }
+    
+    [Authorize]
+    [HttpDelete("{id:guid}/users/current")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [SwaggerOperation(
+        Summary = "Deletes ingredient user for current user",
+        Description = "Requires authenticated user",
+        OperationId = nameof(DeleteIngredientUserAsync)
+    )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, "Ingredient user for current user has been successfully deleted")]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Ingredient not found", typeof(ErrorDto))]
+    public async Task<IActionResult> DeleteIngredientUserAsync([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        await Mediator.Send(new DeleteIngredientUserCommand(id), cancellationToken);
+        return NoContent();
     }
     
     [HttpGet("{id:guid}/short-info")]

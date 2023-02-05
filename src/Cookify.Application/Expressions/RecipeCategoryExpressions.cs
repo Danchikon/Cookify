@@ -10,6 +10,11 @@ public static class RecipeCategoryExpressions
         return recipeCategory => name == null || recipeCategory.Name.ToLower() == name.ToLower();
     }
     
+    public static Expression<Func<RecipeCategoryEntity, bool>> CreateByEquals(Guid? createdBy, bool checkNull = true)
+    {
+        return recipeCategory => (checkNull && createdBy == null) || recipeCategory.CreatedBy == createdBy;
+    }
+    
     public static Expression<Func<RecipeCategoryEntity, bool>> NameContains(string? name)
     {
         return recipeCategory => name == null || recipeCategory.Name.ToLower().Contains(name.ToLower());

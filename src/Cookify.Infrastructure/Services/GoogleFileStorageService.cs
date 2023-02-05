@@ -40,7 +40,7 @@ public class GoogleFileStorageService : IFileStorageService
                 file.ContentType,
                 file.Stream
             );
-            
+
             _logger.LogInformation("File {FileName} putted into google storage", file.Name);
             
             
@@ -61,7 +61,7 @@ public class GoogleFileStorageService : IFileStorageService
     {
         var stream = new MemoryStream();
         var file = await _storageClient.Value.DownloadObjectAsync(_options.Bucket, fileName, stream);
-
+        
         return new FileModel(stream, file.ContentType, file.Name);
     }
 

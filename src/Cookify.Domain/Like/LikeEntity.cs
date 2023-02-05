@@ -15,11 +15,9 @@ public class LikeEntity : BaseEntity
         
     }
     
-    public LikeEntity(RecipeEntity recipe, UserEntity user)
+    public LikeEntity(Guid recipeId, Guid userId)
     {
-        Recipe = recipe;
-        RecipeId = recipe.Id;
-        User = user;
-        CreatedBy = user.Id;
+        RecipeId = recipeId; ;
+        CreatedBy = userId;
     }
 }

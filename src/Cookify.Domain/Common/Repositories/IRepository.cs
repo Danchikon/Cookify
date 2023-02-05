@@ -8,6 +8,6 @@ public interface IRepository<TEntity> : IReadOnlyRepository<TEntity> where TEnti
     Task AddRangeAsync(IEnumerable<TEntity> entities);
     ValueTask PartiallyUpdateAsync(Guid id, PartialEntity<TEntity> partialEntity);
     ValueTask UpdateAsync(TEntity entity);
-    ValueTask RemoveAsync(Guid id);
+    ValueTask RemoveAsync(Guid id, bool softRemove = true);
     
 }

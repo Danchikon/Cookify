@@ -8,8 +8,8 @@ public class UnauthenticatedException : BusinessExceptionBase
     {
     }
     
-    public static UnauthenticatedException Create(string email)
+    public static UnauthenticatedException Create()
     {
-        return new UnauthenticatedException($"User {email} not authenticated");
+        return new UnauthenticatedException($"User not authenticated");
     }
 }

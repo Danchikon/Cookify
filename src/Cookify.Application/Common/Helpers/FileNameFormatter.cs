@@ -17,8 +17,18 @@ public static class FileNameFormatter
         return $"ingredients/{GuidToShortStringConverter.FromGuidToShortString(ingredientId)}";
     }
     
-    public static string FormatForRecipeImage(Guid ingredientId)
+    public static string FormatForRecipeImage(Guid recipeId)
     {
-        return $"recipes/{GuidToShortStringConverter.FromGuidToShortString(ingredientId)}";
+        return $"recipes/{GuidToShortStringConverter.FromGuidToShortString(recipeId)}";
+    }
+    
+    public static string FormatForRecipePdf(Guid recipeId)
+    {
+        return $"pdf-recipes/{GuidToShortStringConverter.FromGuidToShortString(recipeId)}";
+    }
+    
+    public static string FormatForRecipeUkrainianPdf(Guid recipeId)
+    {
+        return $"pdf-recipes/ukrainian/{GuidToShortStringConverter.FromGuidToShortString(recipeId)}";
     }
 }

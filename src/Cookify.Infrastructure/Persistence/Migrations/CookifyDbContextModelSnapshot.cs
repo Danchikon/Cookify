@@ -31,7 +31,7 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 4, 22, 32, 3, 220, DateTimeKind.Unspecified).AddTicks(3563), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 6, 20, 49, 40, 109, DateTimeKind.Unspecified).AddTicks(1750), new TimeSpan(0, 0, 0, 0, 0)));
 
                     b.Property<Guid?>("CreatedBy")
                         .IsRequired()
@@ -53,7 +53,8 @@ namespace Cookify.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.HasIndex("RecipeId");
+                    b.HasIndex("RecipeId", "CreatedBy")
+                        .IsUnique();
 
                     b.ToTable("Favorites");
                 });
@@ -67,7 +68,7 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 4, 22, 32, 3, 220, DateTimeKind.Unspecified).AddTicks(7566), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 6, 20, 49, 40, 109, DateTimeKind.Unspecified).AddTicks(6094), new TimeSpan(0, 0, 0, 0, 0)));
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
@@ -134,6 +135,26 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.ToTable("IngredientRecipes");
                 });
 
+            modelBuilder.Entity("Cookify.Domain.IngredientUser.IngredientUserEntity", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UkrainianMeasure")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.HasKey("UserId", "IngredientId");
+
+                    b.HasIndex("IngredientId");
+
+                    b.ToTable("IngredientUsers");
+                });
+
             modelBuilder.Entity("Cookify.Domain.Like.LikeEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -143,7 +164,7 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 4, 22, 32, 3, 221, DateTimeKind.Unspecified).AddTicks(2122), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 6, 20, 49, 40, 110, DateTimeKind.Unspecified).AddTicks(3451), new TimeSpan(0, 0, 0, 0, 0)));
 
                     b.Property<Guid?>("CreatedBy")
                         .IsRequired()
@@ -165,7 +186,8 @@ namespace Cookify.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CreatedBy");
 
-                    b.HasIndex("RecipeId");
+                    b.HasIndex("RecipeId", "CreatedBy")
+                        .IsUnique();
 
                     b.ToTable("Likes");
                 });
@@ -179,7 +201,7 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 4, 22, 32, 3, 221, DateTimeKind.Unspecified).AddTicks(6584), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 6, 20, 49, 40, 110, DateTimeKind.Unspecified).AddTicks(8704), new TimeSpan(0, 0, 0, 0, 0)));
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
@@ -231,7 +253,7 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 4, 22, 32, 3, 221, DateTimeKind.Unspecified).AddTicks(5532), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 6, 20, 49, 40, 110, DateTimeKind.Unspecified).AddTicks(7603), new TimeSpan(0, 0, 0, 0, 0)));
 
                     b.Property<string>("ImageLink")
                         .IsRequired()
@@ -276,7 +298,7 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 4, 22, 32, 3, 221, DateTimeKind.Unspecified).AddTicks(8537), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 6, 20, 49, 40, 111, DateTimeKind.Unspecified).AddTicks(1084), new TimeSpan(0, 0, 0, 0, 0)));
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
@@ -294,6 +316,9 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("PdfLink")
+                        .HasColumnType("text");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -305,6 +330,9 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                         .HasMaxLength(40000)
                         .HasColumnType("character varying(40000)")
                         .HasDefaultValue("");
+
+                    b.Property<string>("UkrainianPdfLink")
+                        .HasColumnType("text");
 
                     b.Property<string>("UkrainianTitle")
                         .IsRequired()
@@ -328,6 +356,41 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.ToTable("Recipes");
                 });
 
+            modelBuilder.Entity("Cookify.Domain.Session.SessionEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 6, 20, 49, 40, 111, DateTimeKind.Unspecified).AddTicks(5622), new TimeSpan(0, 0, 0, 0, 0)));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RefreshTokenHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("SessionExpirationTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Sessions");
+                });
+
             modelBuilder.Entity("Cookify.Domain.User.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -340,7 +403,7 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 4, 22, 32, 3, 222, DateTimeKind.Unspecified).AddTicks(2567), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasDefaultValue(new DateTimeOffset(new DateTime(2023, 2, 6, 20, 49, 40, 112, DateTimeKind.Unspecified).AddTicks(2514), new TimeSpan(0, 0, 0, 0, 0)));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -353,6 +416,9 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("SessionId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -411,6 +477,25 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Navigation("Recipe");
                 });
 
+            modelBuilder.Entity("Cookify.Domain.IngredientUser.IngredientUserEntity", b =>
+                {
+                    b.HasOne("Cookify.Domain.Ingredient.IngredientEntity", "Ingredient")
+                        .WithMany("IngredientUsers")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Cookify.Domain.User.UserEntity", "User")
+                        .WithMany("IngredientUsers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Cookify.Domain.Like.LikeEntity", b =>
                 {
                     b.HasOne("Cookify.Domain.User.UserEntity", "User")
@@ -447,9 +532,22 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Cookify.Domain.Session.SessionEntity", b =>
+                {
+                    b.HasOne("Cookify.Domain.User.UserEntity", "User")
+                        .WithOne("Session")
+                        .HasForeignKey("Cookify.Domain.Session.SessionEntity", "UserId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Cookify.Domain.Ingredient.IngredientEntity", b =>
                 {
                     b.Navigation("IngredientRecipes");
+
+                    b.Navigation("IngredientUsers");
                 });
 
             modelBuilder.Entity("Cookify.Domain.MealCategory.RecipeCategoryEntity", b =>
@@ -470,9 +568,13 @@ namespace Cookify.Infrastructure.Persistence.Migrations
                 {
                     b.Navigation("Favorites");
 
+                    b.Navigation("IngredientUsers");
+
                     b.Navigation("Likes");
 
                     b.Navigation("Recipes");
+
+                    b.Navigation("Session");
                 });
 #pragma warning restore 612, 618
         }

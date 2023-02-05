@@ -8,21 +8,26 @@ public static class IngredientExpressions
 {
     public static Expression<Func<IngredientEntity, bool>> NameEquals(string? name)
     {
-        return mealCategory => name == null || mealCategory.Name.ToLower() == name.ToLower();
+        return ingredient => name == null || ingredient.Name.ToLower() == name.ToLower();
+    }
+    
+    public static Expression<Func<IngredientEntity, bool>> CreateByEquals(Guid? createdBy, bool checkNull = true)
+    {
+        return ingredient => (checkNull && createdBy == null) || ingredient.CreatedBy == createdBy;
     }
     
     public static Expression<Func<IngredientEntity, bool>> NameContains(string? name)
     {
-        return mealCategory => name == null || mealCategory.Name.ToLower().Contains(name.ToLower());
+        return ingredient => name == null || ingredient.Name.ToLower().Contains(name.ToLower());
     }
     
     public static Expression<Func<IngredientEntity, bool>> UkrainianNameEquals(string? name)
     {
-        return mealCategory => name == null || mealCategory.UkrainianName.ToLower() == name.ToLower();
+        return ingredient => name == null || ingredient.UkrainianName.ToLower() == name.ToLower();
     }
     
     public static Expression<Func<IngredientEntity, bool>> UkrainianNameContains(string? name)
     {
-        return mealCategory => name == null || mealCategory.UkrainianName.ToLower().Contains(name.ToLower());
+        return ingredient => name == null || ingredient.UkrainianName.ToLower().Contains(name.ToLower());
     }
 }

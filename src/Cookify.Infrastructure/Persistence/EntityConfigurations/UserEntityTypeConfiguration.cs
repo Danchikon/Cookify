@@ -1,3 +1,4 @@
+using Cookify.Domain.Session;
 using Cookify.Domain.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -56,6 +57,13 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
         #endregion
 
         #region Relations
+        
+        builder
+            .HasOne(user => user.Session)
+            .WithOne(session => session.User)
+            .HasForeignKey<SessionEntity>(session => session.UserId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder
             .HasMany(user => user.Likes)
@@ -73,6 +81,12 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<UserEntity>
             .HasMany(user => user.Recipes)
             .WithOne(recipe => recipe.User)
             .HasForeignKey(recipe => recipe.CreatedBy);
+        
+        builder
+            .HasMany(user => user.IngredientUsers)
+            .WithOne(ingredientUser => ingredientUser.User)
+            .HasForeignKey(ingredientUser => ingredientUser.UserId)
+            .IsRequired();
         
         #endregion
     }

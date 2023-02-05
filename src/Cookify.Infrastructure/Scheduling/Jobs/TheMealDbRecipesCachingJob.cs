@@ -1,3 +1,4 @@
+using Cookify.Application.Common.Constants;
 using Cookify.Application.Common.Helpers;
 using Cookify.Application.Expressions;
 using Cookify.Application.Models;
@@ -9,6 +10,7 @@ using Cookify.Domain.Recipe;
 using Cookify.Domain.RecipeCategory;
 using Cookify.Infrastructure.Dtos.TheMealDb;
 using Cookify.Infrastructure.Services.RestApis;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
@@ -17,7 +19,7 @@ namespace Cookify.Infrastructure.Scheduling.Jobs;
 [DisallowConcurrentExecution]
 public class TheMealDbRecipesCachingJob : IJob
 {
-    private static readonly SemaphoreSlim SemaphoreSlim = new(1);
+    private static readonly SemaphoreSlim TheMealDbSemaphoreSlim = new(5);
     
     private const uint TheMealDbRecipeFirstId = 52800;
     private const uint TheMealDbRecipeLastId = 53000;
@@ -65,74 +67,105 @@ public class TheMealDbRecipesCachingJob : IJob
             
             getRecipeAsyncTasks.Add(Task.Run(async () =>
             {
-                var response = await _theMealDbApi.GetRecipeAsync(idCopy);
-                
-                return response.Recipes?.FirstOrDefault();
+                try
+                {
+                    await TheMealDbSemaphoreSlim.WaitAsync();
+
+                    var response = await _theMealDbApi.GetRecipeAsync(idCopy);
+
+                    return response.Recipes?.FirstOrDefault();
+                }
+                finally
+                {
+                    TheMealDbSemaphoreSlim.Release();
+                }
             }));
         }
 
         RecipeDto[] recipeDtos = (await Task.WhenAll(getRecipeAsyncTasks)).Where(recipe => recipe is not null).ToArray()!;
 
-        var existedRecipes = await _recipesRepository.WhereAsync(recipe => recipe.CreatedBy == null);
-        var existedRecipesTitles = existedRecipes.Select(recipe => recipe.Title.ToLower());
-        var missingRecipes = recipeDtos.Where(dto => !existedRecipesTitles.Contains(dto.Name.ToLower())).ToArray(); 
-        
-        var selectRecipesTasks = missingRecipes.Select(async dto =>
+        var existedRecipes = await _recipesRepository.WhereAsync(new []
         {
-            try
-            { 
-                await SemaphoreSlim.WaitAsync();
+            RecipeExpressions.CreateByEquals(null, false)
+        });
+        var existedRecipesTitles = existedRecipes.Select(recipe => recipe.Title.ToLower());
+        var missingRecipesDtos = recipeDtos.Where(dto => !existedRecipesTitles.Contains(dto.Name.ToLower())).ToArray();
 
-                var translateNameAsyncTask = _textTranslationService.TranslateAsync(dto.Name, "en", "uk");
-                var downloadAsyncTask = _internetFileDownloaderService.DownloadAsync(new Uri(dto.ImageLink));
-                var translateInstructionAsyncTask = _textTranslationService.TranslateAsync(dto.Instruction, "en", "uk");
-                var firstAsyncTask = _recipeCategoriesRepository.FirstAsync(category => category.Name.ToLower() == dto.CategoryName.ToLower());
-
-                var ukrainianInstruction = await translateInstructionAsyncTask;
-                var ukrainianName = await translateNameAsyncTask;
-                var recipeCategory = await firstAsyncTask;
-                await using var imageStream = await downloadAsyncTask;
+        var missingRecipes = new List<RecipeEntity>();
+        
+        foreach (var dto in missingRecipesDtos)
+        {
+            var firstAsyncTask = _recipeCategoriesRepository.FirstAsync(RecipeCategoryExpressions.NameEquals(dto.CategoryName));
             
-                var ingredientsAndMeasures = GetIngredientsAndMeasures(recipeDtos.First());
-
-                var recipeEntity = new RecipeEntity(
-                    dto.Name,
-                    ukrainianName,
-                    dto.Instruction, 
-                    ukrainianInstruction,
-                    recipeCategory.Id
+            var translateInstructionAsyncTask = _textTranslationService.TranslateAsync(
+                sourceText: dto.Instruction, 
+                sourceLanguage: TranslatingConstants.EnglishLanguage, 
+                targetLanguage: TranslatingConstants.UkrainianLanguage
                 );
+            
+            var translateNameAsyncTask = _textTranslationService.TranslateAsync(
+                sourceText: dto.Name, 
+                sourceLanguage: TranslatingConstants.EnglishLanguage, 
+                targetLanguage: TranslatingConstants.UkrainianLanguage
+                );
+            
+            var downloadAsyncTask = _internetFileDownloaderService.DownloadAsync(new Uri(dto.ImageLink));
+            
+            var ukrainianInstruction = await translateInstructionAsyncTask;
+            var ukrainianName = await translateNameAsyncTask;
+            var recipeCategory = await firstAsyncTask;
+            await using var imageStream = await downloadAsyncTask;
+        
+            var ingredientsAndMeasures = GetIngredientsAndMeasures(dto);
+            
+        
+            var recipeEntity = new RecipeEntity(
+                dto.Name,
+                ukrainianName,
+                dto.Instruction, 
+                ukrainianInstruction,
+                recipeCategory.Id
+            );
 
-                foreach (var (measure, ingredientName) in ingredientsAndMeasures)
+            foreach (var (measure, ingredientName) in ingredientsAndMeasures)
+            {
+                var ingredientEntity = await _ingredientsRepository.FirstOrDefaultAsync(IngredientExpressions.NameEquals(ingredientName));
+                
+                if (ingredientEntity is null)
                 {
-                    var ingredientEntity = await _ingredientsRepository.FirstAsync(IngredientExpressions.NameEquals(ingredientName));
-                    var ukrainianMeasure = await _textTranslationService.TranslateAsync(measure, "en", "uk");
-                    recipeEntity.IngredientRecipes.Add(new IngredientRecipeEntity(
-                        ingredientEntity.Id, 
-                        recipeEntity.Id, 
-                        measure,
-                        ukrainianMeasure
-                        ));
+                    continue;
                 }
 
-                var imageName = FileNameFormatter.FormatForRecipeImage(recipeEntity.Id);
-                var contentType = FileExtensionsParser.ParseFromLink(dto.ImageLink);
-                await _fileStorageService.PutFileAsync(new FileModel(imageStream, contentType, imageName));
-                recipeEntity.ImageLink = _fileStorageService.GetFileLink(imageName);
+                if (recipeEntity.IngredientRecipes.Any(ingredientRecipe => ingredientRecipe.IngredientId == ingredientEntity.Id))
+                {
+                    continue;
+                }
 
-                return recipeEntity;
+                var ukrainianMeasure = await _textTranslationService.TranslateAsync( 
+                    sourceText: measure, 
+                    sourceLanguage: TranslatingConstants.EnglishLanguage, 
+                    targetLanguage: TranslatingConstants.UkrainianLanguage
+                    );
+              
+                recipeEntity.IngredientRecipes.Add(new IngredientRecipeEntity(
+                    ingredientEntity.Id, 
+                    recipeEntity.Id, 
+                    measure,
+                    ukrainianMeasure
+                ));
             }
-            finally
-            {
-                SemaphoreSlim.Release();
-            }
-        });
-        
-        var recipes = await Task.WhenAll(selectRecipesTasks);
+
+            var imageName = FileNameFormatter.FormatForRecipeImage(recipeEntity.Id);
+            var contentType = FileExtensionsParser.ParseFromLink(dto.ImageLink);
+            await _fileStorageService.PutFileAsync(new FileModel(imageStream, contentType, imageName));
+            recipeEntity.ImageLink = _fileStorageService.GetFileLink(imageName);
+            
+            missingRecipes.Add(recipeEntity);
+        }
 
         try
         {
-            await _recipesRepository.AddRangeAsync(recipes);
+            await _recipesRepository.AddRangeAsync(missingRecipes);
             await _unitOfWork.SaveChangesAsync();
         }
         catch (Exception exception)

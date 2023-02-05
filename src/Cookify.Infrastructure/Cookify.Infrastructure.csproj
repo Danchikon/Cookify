@@ -12,6 +12,10 @@
       <PackageReference Include="Google.Cloud.Translation.V2" Version="3.1.0" />
       <PackageReference Include="GraphQL.Client" Version="5.1.1" />
       <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="5.1.1" />
+      <PackageReference Include="Handlebars.Net" Version="2.1.2" />
+      <PackageReference Include="IronPdf" Version="2023.1.11416" />
+      <PackageReference Include="IronPdf.Linux" Version="2023.1.11416" />
+      <PackageReference Include="IronPdf.Native.Chrome.Linux" Version="2023.1.11387" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.13" />
       <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="6.0.13" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
@@ -36,6 +40,14 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Persistence\Migrations\SqlScripts\QuartzDbMigration.sql">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+
+        <EmbeddedResource Include="Common\PdfTemplates\recipePdf.handlebars">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+
+        <EmbeddedResource Include="Common\PdfTemplates\recipeUkrainianPdf.handlebars">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>

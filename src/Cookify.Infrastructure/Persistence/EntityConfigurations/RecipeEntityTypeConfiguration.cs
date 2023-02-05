@@ -46,7 +46,15 @@ public class RecipeEntityTypeConfiguration : IEntityTypeConfiguration<RecipeEnti
             .HasDefaultValue(string.Empty);
         
         builder
-            .Property(mealCategory => mealCategory.ImageLink)
+            .Property(recipe => recipe.ImageLink)
+            .HasDefaultValue(null);
+        
+        builder
+            .Property(recipe => recipe.PdfLink)
+            .HasDefaultValue(null);
+        
+        builder
+            .Property(recipe => recipe.UkrainianPdfLink)
             .HasDefaultValue(null);
         
         #endregion

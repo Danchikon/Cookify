@@ -1,5 +1,7 @@
 using AngleSharp;
+using Cookify.Application.Common.Constants;
 using Cookify.Application.Common.Helpers;
+using Cookify.Application.Expressions;
 using Cookify.Application.Models;
 using Cookify.Application.Services;
 using Cookify.Domain.Common.UnitOfWork;
@@ -21,7 +23,7 @@ public class TheMealDbIngredientsCachingJob : IJob
     private readonly IImageSearcherService _imageSearcherService;
     private readonly IInternetFileDownloaderService _internetFileDownloaderService;
     private readonly IFileStorageService _fileStorageService;
-    private static readonly SemaphoreSlim SemaphoreSlim = new(1);
+    private static readonly SemaphoreSlim SemaphoreSlim = new(15);
 
     public TheMealDbIngredientsCachingJob(
         ITheMealDbApi theMealDbApi, 
@@ -48,7 +50,10 @@ public class TheMealDbIngredientsCachingJob : IJob
     {
         var responseDto = await _theMealDbApi.GetIngredientsAsync();
 
-        var existedIngredients = await _ingredientsRepository.WhereAsync(ingredient => ingredient.CreatedBy == null);
+        var existedIngredients = await _ingredientsRepository.WhereAsync(new []
+        {
+            IngredientExpressions.CreateByEquals(null, false)
+        });
         var existedIngredientsNames = existedIngredients.Select(ingredient => ingredient.Name.ToLower());
         var missingIngredients = responseDto.Ingredients.Where(dto => !existedIngredientsNames.Contains(dto.Name.ToLower())).ToArray(); 
 
@@ -58,13 +63,22 @@ public class TheMealDbIngredientsCachingJob : IJob
             {
                 await SemaphoreSlim.WaitAsync();
                 
-                var translateNameAsyncTask = _textTranslationService.TranslateAsync(dto.Name, "en", "uk");
+                var translateNameAsyncTask = _textTranslationService.TranslateAsync( 
+                    sourceText: dto.Name, 
+                    sourceLanguage: TranslatingConstants.EnglishLanguage, 
+                    targetLanguage: TranslatingConstants.UkrainianLanguage
+                    );
+                
                 var firstImageAsyncTask = _imageSearcherService.FirstImageAsync(dto.Name);
                 Task<string>? translateDescriptionAsyncTask = null;
             
                 if (!string.IsNullOrWhiteSpace(dto.Description))
                 {
-                    translateDescriptionAsyncTask = _textTranslationService.TranslateAsync(dto.Description!, "en", "uk");
+                    translateDescriptionAsyncTask = _textTranslationService.TranslateAsync( 
+                        sourceText: dto.Description, 
+                        sourceLanguage: TranslatingConstants.EnglishLanguage, 
+                        targetLanguage: TranslatingConstants.UkrainianLanguage
+                        );
                 }
 
                 var ukrainianDescription = translateDescriptionAsyncTask is null ? null : await translateDescriptionAsyncTask;

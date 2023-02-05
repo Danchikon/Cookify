@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Cookify.Domain.IngredientRecipe;
 using Cookify.Domain.MealCategory;
 using Cookify.Domain.Recipe;
 
@@ -6,17 +7,22 @@ namespace Cookify.Application.Expressions;
 
 public static class RecipeExpressions
 {
-    public static Expression<Func<RecipeEntity, object>> Category()
+    public static Expression<Func<RecipeEntity, object?>> Category()
     {
         return recipe => recipe.Category;
     }
     
-    public static Expression<Func<RecipeEntity, object>> Likes()
+    public static Expression<Func<RecipeEntity, object?>> Likes()
     {
         return recipe => recipe.Likes;
     }
     
-    public static Expression<Func<RecipeEntity, object>> IngredientRecipes()
+    public static Expression<Func<RecipeEntity, bool>> CreateByEquals(Guid? createdBy, bool checkNull = true)
+    {
+        return recipe => (checkNull && createdBy == null) || recipe.CreatedBy == createdBy;
+    }
+    
+    public static Expression<Func<RecipeEntity, object?>> IngredientRecipes()
     {
         return recipe => recipe.IngredientRecipes;
     }
@@ -39,5 +45,15 @@ public static class RecipeExpressions
     public static Expression<Func<RecipeEntity, bool>> UkrainianTitleContains(string? name)
     {
         return recipe => name == null || recipe.UkrainianTitle.ToLower().Contains(name.ToLower());
+    }
+    
+    public static Expression<Func<RecipeEntity, bool>> CategoryIdEquals(Guid? id)
+    {
+        return recipe => id == null || recipe.CategoryId == id;
+    }
+    
+    public static Expression<Func<RecipeEntity, bool>> IngredientsIdsIntersects(ICollection<Guid>? ids)
+    {
+        return recipe => ids == null || recipe.IngredientRecipes.Count(ingredientRecipe => ids.Contains(ingredientRecipe.IngredientId)) == ids.Count;
     }
 }

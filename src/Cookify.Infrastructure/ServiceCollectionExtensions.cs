@@ -2,11 +2,16 @@ using System.Net;
 using AngleSharp;
 using Cookify.Application.Services;
 using Cookify.Domain.Common.UnitOfWork;
+using Cookify.Domain.Favorite;
 using Cookify.Domain.Ingredient;
+using Cookify.Domain.IngredientUser;
+using Cookify.Domain.Like;
 using Cookify.Domain.MealCategory;
 using Cookify.Domain.ProductMarket;
 using Cookify.Domain.Recipe;
 using Cookify.Domain.RecipeCategory;
+using Cookify.Domain.Session;
+using Cookify.Domain.User;
 using Cookify.Infrastructure.Common.Seeders;
 using Cookify.Infrastructure.Options;
 using Cookify.Infrastructure.Persistence;
@@ -23,6 +28,8 @@ using Google.Cloud.Translation.V2;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
+using IronPdf;
+using IronPdf.Rendering.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,6 +50,7 @@ public static class ServiceCollectionExtensions
         services.AddInternetFileDownloader();
         services.AddTheMealDbApi();
         services.AddSilpoProductMarket();
+        services.AddIronPdf();
         services.AddGoogleFileStorage();
         services.AddGoogleTextTranslation();
         services.AddQuartzScheduling();
@@ -53,6 +61,34 @@ public static class ServiceCollectionExtensions
         return services;
     }
     
+    public static IServiceCollection AddIronPdf(this IServiceCollection services)
+    {
+        Installation.LinuxAndDockerDependenciesAutoConfig = false;
+        Installation.ChromeGpuMode = IronPdf.Engines.Chrome.ChromeGpuModes.Disabled;
+        Installation.Initialize();
+
+        services.AddScoped<BasePdfRenderer, ChromePdfRenderer>();
+        
+        return services;
+    }
+    
+    public static IServiceCollection AddInternetFileDownloader(this IServiceCollection services)
+    {
+        services.AddScoped<WebClient, FileWebClient>();
+        services.AddScoped<IInternetFileDownloaderService, InternetFileDownloaderService>();
+
+        return services;
+    }
+    
+    public static IServiceCollection AddSeeders(this IServiceCollection services)
+    {
+        services.AddScoped<SeederBase, ProductMarketsSeeder>();
+
+        return services;
+    }
+
+    #region TheMealDBApi
+
     public static IServiceCollection AddTheMealDbApi(this IServiceCollection services)
     {
         using var serviceProvider = services.BuildServiceProvider();
@@ -68,12 +104,17 @@ public static class ServiceCollectionExtensions
             .AddRefitClient<ITheMealDbApi>()
             .ConfigureHttpClient(httpClient =>
             {
+                httpClient.Timeout = TimeSpan.FromMinutes(10);
                 httpClient.BaseAddress = new Uri(options.Url);
             });
 
         return services;
     }
     
+    #endregion
+
+    #region Product Markets
+
     public static IServiceCollection AddSilpoProductMarket(this IServiceCollection services)
     {
         using var serviceProvider = services.BuildServiceProvider();
@@ -91,30 +132,27 @@ public static class ServiceCollectionExtensions
         return services;
     }
     
-    public static IServiceCollection AddInternetFileDownloader(this IServiceCollection services)
-    {
-        services.AddScoped<WebClient>();
-        services.AddScoped<IInternetFileDownloaderService, InternetFileDownloaderService>();
+    #endregion
 
-        return services;
-    }
-    
-    public static IServiceCollection AddSeeders(this IServiceCollection services)
-    {
-        services.AddScoped<SeederBase, ProductMarketsSeeder>();
+    #region Repositories
 
-        return services;
-    }
-    
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IRecipeCategoriesRepository, RecipeCategoriesRepository>();
         services.AddScoped<IIngredientsRepository, IngredientsRepository>();
         services.AddScoped<IProductMarketsRepository, ProductMarketsRepository>();
         services.AddScoped<IRecipesRepository, RecipesRepository>();
+        services.AddScoped<ISessionsRepository, SessionsRepository>();
+        services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddScoped<IFavoritesRepository, FavoritesRepository>();
+        services.AddScoped<IFavoritesRepository, FavoritesRepository>();
+        services.AddScoped<ILikesRepository, LikesRepository>();
+        services.AddScoped<IIngredientUsersRepository, IngredientUsersRepository>();
         
         return services;
     }
+    
+    #endregion
 
     #region Google Translation 
 
@@ -129,7 +167,13 @@ public static class ServiceCollectionExtensions
         services.Configure<GoogleTranslationOptions>(section, binderOptions => binderOptions.ErrorOnUnknownConfiguration = true);
         section.Bind(options);
 
-        services.AddScoped(_ => TranslationClient.CreateFromApiKey(options.ApiKey));
+        services.AddScoped(_ =>
+        {
+            var client = TranslationClient.CreateFromApiKey(options.ApiKey);
+            client.Service.HttpClient.Timeout = TimeSpan.FromMinutes(10);
+            
+            return client;
+        });
         
         services.AddScoped<ITextTranslationService, GoogleTextTranslationService>();
 
@@ -173,6 +217,18 @@ public static class ServiceCollectionExtensions
 
         services.AddQuartz(quartzConfigurator =>
         {
+            quartzConfigurator.ScheduleJob<RecipePdfGeneratorJob>(triggerConfigurator =>
+            {
+                triggerConfigurator.ForJob(nameof(RecipePdfGeneratorJob));
+                triggerConfigurator.WithIdentity(nameof(RecipePdfGeneratorJob));
+                triggerConfigurator.StartNow();
+                triggerConfigurator.WithSimpleSchedule(scheduleBuilder =>
+                {
+                    scheduleBuilder.RepeatForever();
+                    scheduleBuilder.WithIntervalInMinutes(10);
+                });
+            });
+            
             quartzConfigurator.ScheduleJob<TheMealDbRecipeCategoriesCachingJob>(triggerConfigurator =>
             {
                 triggerConfigurator.ForJob(nameof(TheMealDbRecipeCategoriesCachingJob));
@@ -196,7 +252,7 @@ public static class ServiceCollectionExtensions
                     scheduleBuilder.WithIntervalInHours(12);
                 });
             });
-
+            
             quartzConfigurator.ScheduleJob<TheMealDbIngredientsCachingJob>(triggerConfigurator =>
             {
                 triggerConfigurator.ForJob(nameof(TheMealDbIngredientsCachingJob));

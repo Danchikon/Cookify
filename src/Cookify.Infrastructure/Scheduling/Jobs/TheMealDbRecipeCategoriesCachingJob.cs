@@ -1,4 +1,5 @@
 using System.Xml.XPath;
+using Cookify.Application.Common.Constants;
 using Cookify.Application.Common.Helpers;
 using Cookify.Application.Expressions;
 using Cookify.Application.Models;
@@ -22,7 +23,7 @@ public class TheMealDbRecipeCategoriesCachingJob : IJob
     private readonly IFileStorageService _fileStorageService;
     private readonly IInternetFileDownloaderService _internetFileDownloaderService;
     private readonly ILogger<TheMealDbRecipeCategoriesCachingJob> _logger;
-    private static readonly SemaphoreSlim SemaphoreSlim = new(1);
+    private static readonly SemaphoreSlim SemaphoreSlim = new(15);
 
     public TheMealDbRecipeCategoriesCachingJob(
         ITheMealDbApi theMealDbApi, 
@@ -47,7 +48,10 @@ public class TheMealDbRecipeCategoriesCachingJob : IJob
     {
         var responseDto = await _theMealDbApi.GetRecipeCategoriesAsync();
 
-        var existedCategories = await _recipeCategoriesRepository.WhereAsync(category => category.CreatedBy == null);
+        var existedCategories = await _recipeCategoriesRepository.WhereAsync(new []
+        {
+            RecipeCategoryExpressions.CreateByEquals(null, false)
+        });
         var existedCategoriesNames = existedCategories.Select(category => category.Name.ToLower());
         var missingCategories = responseDto.Categories.Where(dto => !existedCategoriesNames.Contains(dto.Name.ToLower())).ToArray();
 
@@ -57,13 +61,22 @@ public class TheMealDbRecipeCategoriesCachingJob : IJob
             {
                 await SemaphoreSlim.WaitAsync();
                 
-                var translateNameAsyncTask = _textTranslationService.TranslateAsync(dto.Name, "en", "uk");
+                var translateNameAsyncTask = _textTranslationService.TranslateAsync( 
+                    sourceText: dto.Name, 
+                    sourceLanguage: TranslatingConstants.EnglishLanguage, 
+                    targetLanguage: TranslatingConstants.UkrainianLanguage
+                    );
+                
                 var downloadAsyncTask = _internetFileDownloaderService.DownloadAsync(new Uri(dto.ImageLink));
                 Task<string>? translateDescriptionAsyncTask = null;
 
                 if (!string.IsNullOrWhiteSpace(dto.Description))
                 {
-                    translateDescriptionAsyncTask = _textTranslationService.TranslateAsync(dto.Description!, "en", "uk");
+                    translateDescriptionAsyncTask = _textTranslationService.TranslateAsync( 
+                        sourceText: dto.Description, 
+                        sourceLanguage: TranslatingConstants.EnglishLanguage, 
+                        targetLanguage: TranslatingConstants.UkrainianLanguage
+                        );
                 }
 
                 var ukrainianDescription = translateDescriptionAsyncTask is null ? null : await translateDescriptionAsyncTask;

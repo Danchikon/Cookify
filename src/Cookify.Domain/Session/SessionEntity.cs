@@ -1,4 +1,5 @@
 using Cookify.Domain.Common.Entities;
+using Cookify.Domain.User;
 
 namespace Cookify.Domain.Session;
 
@@ -8,15 +9,22 @@ public class SessionEntity : IEntity<Guid>
     public bool IsActive { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }
-    public string RefreshToken { get; set; } = null!;
-    public DateTime SessionExpirationTime { get; set; }
+    public string RefreshTokenHash { get; set; } = null!;
+    public DateTimeOffset SessionExpirationTime { get; set; }
+    
+    public Guid UserId { get; set; }
+    public UserEntity User { get; set; } = null!;
 
-    private SessionEntity()
+    public SessionEntity()
     {
         
     }
-    public SessionEntity(string refreshToken)
+    public SessionEntity(string refreshTokenHash, Guid userId, DateTimeOffset sessionExpirationTime)
     {
-        RefreshToken = refreshToken;
+        Id = Guid.NewGuid();
+        CreatedAt = DateTimeOffset.UtcNow;
+        RefreshTokenHash = refreshTokenHash;
+        SessionExpirationTime = sessionExpirationTime;
+        UserId = userId;
     }
 }

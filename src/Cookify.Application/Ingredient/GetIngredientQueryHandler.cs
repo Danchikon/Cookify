@@ -1,7 +1,6 @@
 using Cookify.Application.Common.Cqrs;
 using Cookify.Application.Common.Helpers;
 using Cookify.Application.Dtos.Ingredient;
-using Cookify.Application.MealCategory;
 using Cookify.Application.Services;
 using Cookify.Domain.Ingredient;
 using Cookify.Domain.MealCategory;

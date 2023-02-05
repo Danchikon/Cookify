@@ -25,7 +25,9 @@ public record GetRecipeShortInfosQueryHandler : IQueryHandler<GetRecipeShortInfo
             query.TitleEquals,
             query.TitleContains,
             query.UkrainianTitleEquals,
-            query.UkrainianTitleContains
+            query.UkrainianTitleContains,
+            query.CategoryIdEquals,
+            query.IngredientsIdsIntersects
         );
 
         return recipesPaginatedList;

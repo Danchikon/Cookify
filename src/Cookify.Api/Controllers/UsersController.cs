@@ -1,10 +1,14 @@
 using System.Net.Mime;
 using AutoMapper;
 using Cookify.Api.Common.Controllers;
+using Cookify.Application.Common.Dtos;
 using Cookify.Application.Dtos;
 using Cookify.Application.Dtos.Authentication;
+using Cookify.Application.Dtos.User;
+using Cookify.Application.User;
 using Cookify.Application.User.Authentication;
 using Cookify.Application.User.Avatar;
+using Cookify.Application.User.Registration;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +39,37 @@ public class UsersController : ApiControllerBase
         return Ok(await Mediator.Send(command, cancellationToken));
     }
     
+    [Authorize]
+    [HttpPost("current/authentication/refresh-token")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [SwaggerOperation(
+        Summary = "Refreshes json web token",
+        Description = "Requires authenticated user",
+        OperationId = nameof(RefreshJsonWebTokenAsync)
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Json web token has been successfully refreshed", typeof(JsonWebTokenDto))]
+    public async Task<IActionResult> RefreshJsonWebTokenAsync(
+        [FromBody, SwaggerRequestBody(Required = true)] RefreshJsonWebTokenCommand command,
+        CancellationToken cancellationToken
+    )
+    {
+        return Ok(await Mediator.Send(command, cancellationToken));
+    }
+    
+    [Authorize]
+    [HttpDelete("current/authentication/session")]
+    [SwaggerOperation(
+        Summary = "Deletes current user session",
+        Description = "Requires authenticated user",
+        OperationId = nameof(DeleteCurrentUserSessionAsync)
+    )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, "Current user session has been successfully deleted")]
+    public async Task<IActionResult> DeleteCurrentUserSessionAsync(CancellationToken cancellationToken)
+    {
+        await Mediator.Send(new DeleteCurrentUserSessionCommand(), cancellationToken);
+        return NoContent();
+    }
+    
     [HttpPost("registration")]
     [Consumes(MediaTypeNames.Application.Json)]
     [SwaggerOperation(
@@ -42,42 +77,77 @@ public class UsersController : ApiControllerBase
         Description = "Registers user",
         OperationId = nameof(RegisterAsync)
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Json web token has been successfully generated")]
+    [SwaggerResponse(StatusCodes.Status200OK, "User has been successfully registered")]
     public async Task<IActionResult> RegisterAsync(
-        [FromBody, SwaggerRequestBody(Required = true)] AuthenticateUserCommand command,
+        [FromBody, SwaggerRequestBody(Required = true)] RegisterUserCommand command,
         CancellationToken cancellationToken
     )
     {
         return Ok(await Mediator.Send(command, cancellationToken));
     }
     
-    [HttpGet("avatar/link")]
     [Authorize]
+    [HttpGet("current/short-info")]
     [SwaggerOperation(
-        Summary = "Returns avatar link for current authenticated user",
+        Summary = "Returns current user short info",
         Description = "Requires authenticated user",
-        OperationId = nameof(GetAvatarLinkAsync)
+        OperationId = nameof(GetCurrentUserShortInfoAsync)
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Avatar has been successfully returned", typeof(string))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Current user short info has been successfully returned", typeof(UserShortInfoDto))]
     [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
-    public async Task<IActionResult> GetAvatarLinkAsync(CancellationToken cancellationToken)
+    [SwaggerResponse(StatusCodes.Status404NotFound, "User not found", typeof(ErrorDto))]
+    public async Task<IActionResult> GetCurrentUserShortInfoAsync(CancellationToken cancellationToken)
     {
-        return Ok(await Mediator.Send(new GetUserAvatarLinkQuery(), cancellationToken));
+        return Ok(await Mediator.Send(new GetCurrentUserShortInfoQuery(), cancellationToken));
     }
     
-    [HttpPut("avatar")]
-    [Consumes("multipart/form-data")]
     [Authorize]
+    [HttpGet("current")]
     [SwaggerOperation(
-        Summary = "Uploads avatar for current authenticated user and returns user avatar link",
+        Summary = "Returns current user",
         Description = "Requires authenticated user",
-        OperationId = nameof(UploadAvatarAsync)
+        OperationId = nameof(GetCurrentUserAsync)
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Current user has been successfully returned", typeof(UserDto))]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "User not found", typeof(ErrorDto))]
+    public async Task<IActionResult> GetCurrentUserAsync(CancellationToken cancellationToken)
+    {
+        return Ok(await Mediator.Send(new GetCurrentUserQuery(), cancellationToken));
+    }
+    
+    [Authorize]
+    [HttpPatch("current")]
+    [SwaggerOperation(
+        Summary = "Partially updates current user",
+        Description = "Requires authenticated user",
+        OperationId = nameof(PartiallyUpdateCurrentUserAsync)
+    )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, "Current user has been successfully partially updates")]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "User not found", typeof(ErrorDto))]
+    public async Task<IActionResult> PartiallyUpdateCurrentUserAsync(
+        [FromBody, SwaggerRequestBody(Required = true)] PartiallyUpdateCurrentUserCommand command,
+        CancellationToken cancellationToken
+        )
+    {
+        await Mediator.Send(command, cancellationToken);
+        return NoContent();
+    }
+    
+    [Authorize]
+    [HttpPost("current/avatar")]
+    [Consumes("multipart/form-data")]
+    [SwaggerOperation(
+        Summary = "Uploads avatar for current authenticated user and returns avatar link",
+        Description = "Requires authenticated user",
+        OperationId = nameof(UploadCurrentUserAvatarAsync)
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Avatar has been successfully uploaded", typeof(string))]
     [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
-    public async Task<IActionResult> UploadAvatarAsync(IFormFile formFile, CancellationToken cancellationToken)
+    public async Task<IActionResult> UploadCurrentUserAvatarAsync(IFormFile formFile, CancellationToken cancellationToken)
     {
-        var avatarLink = await Mediator.Send(new UploadUserAvatarCommand(
+        var avatarLink = await Mediator.Send(new UploadCurrentUserAvatarCommand(
             formFile.OpenReadStream(), 
             formFile.ContentType
             ), cancellationToken);
@@ -85,18 +155,18 @@ public class UsersController : ApiControllerBase
         return Ok(avatarLink);
     }
     
-    [HttpDelete("avatar")]
     [Authorize]
+    [HttpDelete("current/avatar")]
     [SwaggerOperation(
         Summary = "Deletes avatar for current authenticated user",
         Description = "Requires authenticated user",
-        OperationId = nameof(DeleteAvatarAsync)
+        OperationId = nameof(DeleteCurrentUserAvatarAsync)
     )]
     [SwaggerResponse(StatusCodes.Status204NoContent, "Avatar has been successfully deleted")]
     [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
-    public async Task<IActionResult> DeleteAvatarAsync(CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteCurrentUserAvatarAsync(CancellationToken cancellationToken)
     {
-        await Mediator.Send(new DeleteUserAvatarCommand(), cancellationToken);
+        await Mediator.Send(new DeleteCurrentUserAvatarCommand(), cancellationToken);
         return NoContent();
     }
 }

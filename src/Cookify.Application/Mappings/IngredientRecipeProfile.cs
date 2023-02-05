@@ -10,20 +10,20 @@ public class IngredientRecipeProfile : Profile
    {
       CreateMap<IngredientRecipeEntity, IngredientRecipeShortInfoDto>()
          .ForMember(
-            destinationMember: dto => dto.Name, 
+            destinationMember: dto => dto.Name,
             memberOptions: configuration => configuration.MapFrom(entity => entity.Ingredient.Name)
-            )
+         )
          .ForMember(
-            destinationMember: dto => dto.UkrainianName, 
+            destinationMember: dto => dto.UkrainianName,
             memberOptions: configuration => configuration.MapFrom(entity => entity.Ingredient.UkrainianName)
          )
          .ForMember(
-            destinationMember: dto => dto.ImageLink, 
+            destinationMember: dto => dto.ImageLink,
             memberOptions: configuration => configuration.MapFrom(entity => entity.Ingredient.ImageLink)
-            )
+         )
          .ForMember(
-            destinationMember: dto => dto.IngredientId, 
+            destinationMember: dto => dto.IngredientId,
             memberOptions: configuration => configuration.MapFrom(entity => entity.IngredientId)
-            );
+         );
    }
 }

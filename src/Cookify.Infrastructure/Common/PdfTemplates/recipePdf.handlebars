@@ -1,0 +1,224 @@
+<html lang="uk">
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title>Paginated HTML</title>
+    <style>
+        .imageContainer {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .imageContainer img {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            object-fit: cover;
+            transition: 300ms all ease-in-out;
+        }
+
+        .hoverAnimation:hover img {
+            transform: scale(1.1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        htmL {
+            width: 100%;
+            height: 100%;
+            webkit-font-smoothing: antialiased;
+            moz-osx-font-smoothing: grayscale;
+        }
+
+        article,
+        aside,
+        details,
+        figcaption,
+        figure,
+        footer,
+        header,
+        hgroup,
+        menu,
+        nav,
+        section {
+            display: block;
+        }
+
+        ol,
+        ul {
+            list-style: none;
+        }
+
+        blockquote,
+        q {
+            quotes: none;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        a:not([class]) {
+            text-decoration: none;
+            text-decoration-skip-ink: auto;
+        }
+
+        a,
+        area,
+        button,
+        input,
+        label,
+        select,
+        summary,
+        textarea,
+        [tabindex] {
+            border: none;
+            outline: none;
+            touch-action: manipulation;
+            moz-appearance: none;
+            -moz-appearance: none;
+            text-decoration: none;
+            -ms-touch-action: manipulation;
+            webkit-appearance: none;
+        }
+
+        :where(button, [type='button' i], [type='reset' i], [type='submit' i]) {
+            webkit-appearance: button;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            html:focus-within {
+                scroll-behavior: smooth;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html:focus-within {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+        }
+
+        body {
+            color: rgba(25, 25, 25, 0.8);
+            width: 100%;
+            height: 100%;
+            font-size: 18px;
+            font-family: 'Open Sans', sans-serif;
+            background-color: rgba(250, 250, 250, 1);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            color: rgba(25, 25, 25, 1);
+            margin: 5px 0;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 52px;
+        }
+
+        h2 {
+            font-size: 48px;
+        }
+
+        h3 {
+            font-size: 36px;
+        }
+
+        h4 {
+            font-size: 30px;
+        }
+
+        h5 {
+            font-size: 24px;
+        }
+
+        h6 {
+            font-size: 18px;
+        }
+
+        a {
+            color: rgba(25, 25, 25, 1);
+        }
+
+        .recipeWrap {
+            gap: 1em;
+            width: 100%;
+            display: flex;        
+            min-height: calc(100vh - 80px);
+            text-align: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .imageWrap {
+            width: 100%;
+            height: 500px;
+            position: relative;
+        }
+
+        .like {
+            color: rgba(205, 4, 4, 1);
+        }
+
+        .ingredientsList {
+            gap: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .steps {
+            text-align: start;
+        }
+    </style>
+</head>
+<body>
+    <div class="recipeWrap">
+        <div>
+            <h2>{{Title}}</h2>
+            <p>Published {{CreatedAt}}</p>
+        </div>
+        <p>Category: {{CategoryName}}</p>
+        <div class="imageWrap">
+            <div class="imageContainer">
+                <img src="{{ImageLink}}" alt="{{Title}}">
+            </div>
+        </div>
+        <h5>Ingredients</h5>
+        <div class="ingredientsList">
+            {{#each IngredientRecipes}}
+                <a href="/ingredients/{{this.Id}}">{{this.Ingredient.Name}} - {{this.Measure}}</a>
+            {{/each}}
+        </div>
+        <p class="steps">{{Instruction}}</p>
+    </div>
+</body>
+</html>

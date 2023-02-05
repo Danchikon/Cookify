@@ -296,6 +296,22 @@
               "target": "Package",
               "version": "[5.1.1, )"
             },
+            "Handlebars.Net": {
+              "target": "Package",
+              "version": "[2.1.2, )"
+            },
+            "IronPdf": {
+              "target": "Package",
+              "version": "[2023.1.11416, )"
+            },
+            "IronPdf.Linux": {
+              "target": "Package",
+              "version": "[2023.1.11416, )"
+            },
+            "IronPdf.Native.Chrome.Linux": {
+              "target": "Package",
+              "version": "[2023.1.11387, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[6.0.13, )"

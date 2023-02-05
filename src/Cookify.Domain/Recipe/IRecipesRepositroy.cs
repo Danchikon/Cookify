@@ -12,6 +12,10 @@ public interface IRecipesRepository : IRepository<RecipeEntity>
         string? titleEquals = null,
         string? titleContains = null,
         string? ukrainianTitleEquals = null,
-        string? ukrainianTitleContains = null
+        string? ukrainianTitleContains = null,
+        Guid? categoryIdEquals = null,
+        ICollection<Guid>? ingredientsIdsIntersects = null
     );
+
+    Task<List<RecipeEntity>> WherePdfLinkIsNullAsync();
 }

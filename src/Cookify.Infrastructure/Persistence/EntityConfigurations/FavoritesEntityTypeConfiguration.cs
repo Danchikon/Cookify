@@ -39,5 +39,9 @@ public class FavoriteEntityTypeConfiguration : IEntityTypeConfiguration<Favorite
             .HasForeignKey(favorite => favorite.RecipeId);
         
         #endregion
+
+        builder
+            .HasIndex(favorite => new { favorite.RecipeId, favorite.CreatedBy })
+            .IsUnique();
     }
 }

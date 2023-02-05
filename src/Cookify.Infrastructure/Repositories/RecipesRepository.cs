@@ -23,7 +23,9 @@ public class RecipesRepository : EfRepository<RecipeEntity, CookifyDbContext>, I
         string? titleEquals = null,
         string? titleContains = null, 
         string? ukrainianTitleEquals = null, 
-        string? ukrainianTitleContains = null
+        string? ukrainianTitleContains = null,
+        Guid? categoryIdEquals = null,
+        ICollection<Guid>? ingredientsIdsIntersects = null
         )
     {
         var entities = DbContext.Recipes.AsNoTracking();
@@ -47,6 +49,16 @@ public class RecipesRepository : EfRepository<RecipeEntity, CookifyDbContext>, I
         {
             entities = entities.Where(RecipeExpressions.UkrainianTitleContains(ukrainianTitleContains));
         }
+        
+        if (categoryIdEquals is not null)
+        {
+            entities = entities.Where(RecipeExpressions.CategoryIdEquals(categoryIdEquals));
+        }
+        
+        if (ingredientsIdsIntersects is not null)
+        {
+            entities = entities.Where(RecipeExpressions.IngredientsIdsIntersects(ingredientsIdsIntersects));
+        }
 
         entities
             .Include(recipe => recipe.Category)
@@ -57,5 +69,19 @@ public class RecipesRepository : EfRepository<RecipeEntity, CookifyDbContext>, I
         return await entities
             .ProjectTo<TModel>(Mapper.ConfigurationProvider)
             .PaginateByPageSizeAsync(page, pageSize, offset);
+    }
+    
+    public async Task<List<RecipeEntity>> WherePdfLinkIsNullAsync()
+    {
+        var entities = DbContext.Recipes.AsNoTracking()
+            .Where(recipe => recipe.PdfLink == null || recipe.UkrainianPdfLink == null);
+
+        entities = entities
+            .Include(recipe => recipe.Category)
+            .Include(recipe => recipe.Likes)
+            .Include(recipe => recipe.IngredientRecipes)
+            .ThenInclude(ingredientRecipe => ingredientRecipe.Ingredient);
+
+        return await entities.ToListAsync();
     }
 }

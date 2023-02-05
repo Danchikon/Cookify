@@ -1,5 +1,6 @@
 using Cookify.Domain.Common.Entities;
 using Cookify.Domain.IngredientRecipe;
+using Cookify.Domain.IngredientUser;
 
 namespace Cookify.Domain.Ingredient;
 
@@ -9,9 +10,10 @@ public class IngredientEntity : BaseEntity
     public string UkrainianName { get; set; } = null!;
     public string? Description { get; set; }
     public string? UkrainianDescription { get; set; }
-    public string? ImageLink { get; set; } 
+    public string? ImageLink { get; set; }
 
-    public ICollection<IngredientRecipeEntity> IngredientRecipes { get; set; } = Array.Empty<IngredientRecipeEntity>();
+    public ICollection<IngredientRecipeEntity> IngredientRecipes { get; set; } = new List<IngredientRecipeEntity>();
+    public ICollection<IngredientUserEntity> IngredientUsers { get; set; } = new List<IngredientUserEntity>();
 
     public IngredientEntity() 
     {

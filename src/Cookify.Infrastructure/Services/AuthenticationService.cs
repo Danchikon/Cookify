@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Cookify.Application.Common.Constants;
 using Cookify.Application.Dtos;
 using Cookify.Application.Dtos.Authentication;
 using Cookify.Application.Services;
@@ -24,15 +25,42 @@ public class AuthenticationService : IAuthenticationService
     
     public bool ValidatePassword(string password, string passwordHash)
     {
+        var hashed = GetPasswordHash(password);
+
+        return hashed == passwordHash;
+    }
+    
+    public bool ValidateRefreshToken(string refreshToken, string refreshTokenHash)
+    {
+        var hashed = GetRefreshTokenHash(refreshToken);
+
+        return hashed == refreshTokenHash;
+    }
+
+    public string GetPasswordHash(string password)
+    {
         var hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
             password: password,
-            salt: Encoding.UTF8.GetBytes("salt"),
+            salt: Encoding.UTF8.GetBytes("passwordSalt"),
             prf: KeyDerivationPrf.HMACSHA256,
             iterationCount: 100000,
             numBytesRequested: 256 / 8
-            ));
+        ));
 
-        return hashed == passwordHash;
+        return hashed;
+    }
+
+    public string GetRefreshTokenHash(string refreshToken)
+    {
+        var hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+            password: refreshToken,
+            salt: Encoding.UTF8.GetBytes("refreshTokenSalt"),
+            prf: KeyDerivationPrf.HMACSHA256,
+            iterationCount: 100000,
+            numBytesRequested: 256 / 8
+        ));
+
+        return hashed;
     }
 
     public ClaimsPrincipal? GetClaimsPrincipal(string? token)
@@ -61,7 +89,7 @@ public class AuthenticationService : IAuthenticationService
 
     }
 
-    public JsonWebTokenDto AuthenticateUser(UserEntity user)
+    public JsonWebTokenDto AuthenticateUser(UserEntity user, string? refreshToken = null)
     {
         var now = DateTime.UtcNow;
         var symmetricKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_options.SecretKey));
@@ -72,16 +100,24 @@ public class AuthenticationService : IAuthenticationService
             notBefore: now,
             claims: new []
             {
-                new Claim("userId", user.Id.ToString()),
-                new Claim("username", user.Username),
-                new Claim("email", user.Email)
+                new Claim(UserClaimsConstants.UserId, user.Id.ToString()),
+                new Claim(UserClaimsConstants.Username, user.Username),
+                new Claim(UserClaimsConstants.Email, user.Email)
             },
             expires: now.Add(TimeSpan.FromMinutes(_options.Lifetime)),
             signingCredentials: new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256)
             );
 
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-        var refreshToken = GenerateRefreshToken();
+
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return new JsonWebTokenDto
+            {
+                JsonWebToken = encodedJwt,
+                RefreshToken = GenerateRefreshToken()
+            };
+        }
 
         return new JsonWebTokenDto
         {
@@ -90,7 +126,7 @@ public class AuthenticationService : IAuthenticationService
         };
     }
     
-    private static string GenerateRefreshToken()
+    public string GenerateRefreshToken()
     {
         var bytes = new byte[64];
         using var randomNumberGenerator = RandomNumberGenerator.Create();

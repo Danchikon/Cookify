@@ -40,5 +40,9 @@ public class LikeEntityTypeConfiguration : IEntityTypeConfiguration<LikeEntity>
             .IsRequired();
         
         #endregion
+        
+        builder
+            .HasIndex(like => new { like.RecipeId, like.CreatedBy })
+            .IsUnique();
     }
 }
