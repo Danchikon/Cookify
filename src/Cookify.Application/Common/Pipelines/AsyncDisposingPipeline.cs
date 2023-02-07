@@ -5,7 +5,7 @@ using MediatR;
 namespace Cookify.Application.Common.Pipelines;
 
 public class AsyncDisposingPipeline<TCommand, TResponse> : IPipelineBehavior<TCommand, TResponse> 
-    where TCommand : CommandBase, IRequest<TResponse>, IAsyncDisposable
+    where TCommand : CommandBase<TResponse>, IAsyncDisposable
 {
     public async Task<TResponse> Handle(TCommand command, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {

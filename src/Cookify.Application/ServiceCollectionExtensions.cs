@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
     #region Pipelines
 
     public static IServiceCollection AddTransactionPipeline<TCommand, TResponse>(this IServiceCollection services) 
-        where TCommand : CommandBase, IRequest<TResponse>
+        where TCommand : CommandBase<TResponse>
     {
        
         services.AddScoped(
@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
     }
 
     public static IServiceCollection AddAsyncDisposingPipeline<TCommand, TResponse>(this IServiceCollection services) 
-        where TCommand : CommandBase, IRequest<TResponse>, IAsyncDisposable
+        where TCommand : CommandBase<TResponse>, IAsyncDisposable
     {
        
         services.AddScoped(

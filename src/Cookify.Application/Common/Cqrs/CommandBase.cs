@@ -2,12 +2,12 @@ using MediatR;
 
 namespace Cookify.Application.Common.Cqrs;
 
-public abstract record CommandBase : IRequest
+public abstract record CommandBase : CommandBase<Unit>, IRequest
 {
     
 }
 
-public abstract record CommandBase<TResult> : CommandBase, IRequest<TResult>
+public abstract record CommandBase<TResult> : IRequest<TResult>
 {
     
 }
