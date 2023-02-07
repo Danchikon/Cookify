@@ -19,7 +19,7 @@ namespace Cookify.Infrastructure.Scheduling.Jobs;
 [DisallowConcurrentExecution]
 public class TheMealDbRecipesCachingJob : IJob
 {
-    private static readonly SemaphoreSlim TheMealDbSemaphoreSlim = new(5);
+    private static readonly SemaphoreSlim TheMealDbSemaphoreSlim = new(20);
     
     private const uint TheMealDbRecipeFirstId = 52800;
     private const uint TheMealDbRecipeLastId = 53000;
@@ -167,7 +167,7 @@ public class TheMealDbRecipesCachingJob : IJob
             }
 
             var imageName = FileNameFormatter.FormatForRecipeImage(recipeEntity.Id);
-            var contentType = FileExtensionsParser.ParseFromLink(dto.ImageLink);
+            var contentType = ContentTypeParser.GetImageContentTypeFromLink(dto.ImageLink);
             await _fileStorageService.PutFileAsync(new FileModel(imageStream, contentType, imageName), context.CancellationToken);
             recipeEntity.ImageLink = _fileStorageService.GetFileLink(imageName);
             

@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.Json.Serialization;
 using Cookify.Application.Common.Dtos;
+using Cookify.Domain.Common.Enums;
 using Cookify.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,6 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
-        services.AddHttpContextAccessor();
         services.AddApiControllers();
         services.AddSwagger();
         services.AddJwtBearerAuthentication();
@@ -46,7 +46,8 @@ public static class ServiceCollectionExtensions
                     return new BadRequestObjectResult(new ErrorDto
                     {
                         Title = "InvalidModelState",
-                        Messages = errorMessages
+                        Messages = errorMessages,
+                        Code = (int)ErrorCode.BadRequest
                     });
                 };
             });
@@ -84,14 +85,15 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddJwtBearerAuthentication(this IServiceCollection services)
     {
+        using var serviceProvider = services.BuildServiceProvider();
+        
         AuthenticationOptions options = new();
-        using (var serviceProvider = services.BuildServiceProvider())
-        {
-            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            var section = configuration.GetSection(AuthenticationOptions.SectionName);
-            services.Configure<AuthenticationOptions>(section);
-            section.Bind(options);
-        }
+        
+        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+        var section = configuration.GetSection(AuthenticationOptions.SectionName);
+        services.Configure<AuthenticationOptions>(section);
+        section.Bind(options);
+        
 
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -121,21 +123,22 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
+        using var serviceProvider = services.BuildServiceProvider();
+        
         SwaggerOptions options = new();
-        using (var serviceProvider = services.BuildServiceProvider())
-        {
-            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            var section = configuration.GetSection(SwaggerOptions.SectionName);
-            services.Configure<SwaggerOptions>(section, binderOptions => binderOptions.ErrorOnUnknownConfiguration = true);
-            section.Bind(options);
-        }
+        
+        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+        var section = configuration.GetSection(SwaggerOptions.SectionName);
+        services.Configure<SwaggerOptions>(section, binderOptions => binderOptions.ErrorOnUnknownConfiguration = true);
+        section.Bind(options);
+        
         
         if (!options.Enabled)
         {
             return services;
         }
 
-        return services.AddSwaggerGen(c =>
+        services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc(options.Name, new OpenApiInfo {Title = options.Title, Version = options.Version});
             c.EnableAnnotations();
@@ -172,6 +175,8 @@ public static class ServiceCollectionExtensions
                 }
             });
         });
+
+        return services;
     }
     
     #endregion

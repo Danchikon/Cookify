@@ -23,7 +23,7 @@ public class TheMealDbIngredientsCachingJob : IJob
     private readonly IImageSearcherService _imageSearcherService;
     private readonly IInternetFileDownloaderService _internetFileDownloaderService;
     private readonly IFileStorageService _fileStorageService;
-    private static readonly SemaphoreSlim SemaphoreSlim = new(15);
+    private static readonly SemaphoreSlim SemaphoreSlim = new(20);
 
     public TheMealDbIngredientsCachingJob(
         ITheMealDbApi theMealDbApi, 
@@ -61,7 +61,7 @@ public class TheMealDbIngredientsCachingJob : IJob
         {
             try
             {
-                await SemaphoreSlim.WaitAsync();
+                await SemaphoreSlim.WaitAsync(context.CancellationToken);
                 
                 var translateNameAsyncTask = _textTranslationService.TranslateAsync( 
                     sourceText: dto.Name, 
@@ -102,7 +102,7 @@ public class TheMealDbIngredientsCachingJob : IJob
                 await using var imageStream = await _internetFileDownloaderService.DownloadAsync(new Uri(imageLink), context.CancellationToken);
             
                 var imageName = FileNameFormatter.FormatForIngredientImage(ingredientEntity.Id);
-                await _fileStorageService.PutFileAsync(new FileModel(imageStream, "image/jpeg", imageName), context.CancellationToken);
+                await _fileStorageService.PutFileAsync(new FileModel(imageStream, ContentTypesConstants.ImageJpeg, imageName), context.CancellationToken);
                 ingredientEntity.ImageLink = _fileStorageService.GetFileLink(imageName);
             
                 return ingredientEntity;

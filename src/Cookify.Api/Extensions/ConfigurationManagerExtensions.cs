@@ -1,3 +1,5 @@
+using Cookify.Infrastructure.Common.Helpers;
+
 namespace Cookify.Api.Extensions;
 
 public static class ConfigurationManagerExtensions
@@ -7,10 +9,9 @@ public static class ConfigurationManagerExtensions
         const string appSettingsFileName = "appsettings";
         const string appSettingsFileExtension = "json";
 
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
         manager.AddJsonFile($"{appSettingsFileName}.{appSettingsFileExtension}");
-        manager.AddJsonFile($"{appSettingsFileName}.{environment}.{appSettingsFileExtension}", true);
+        manager.AddJsonFile($"{appSettingsFileName}.{AspNetCoreEnvironment.Name}.{appSettingsFileExtension}", true);
+        manager.AddEnvironmentVariables();
 
         return manager;
     }

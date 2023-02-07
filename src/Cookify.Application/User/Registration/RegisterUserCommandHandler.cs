@@ -4,6 +4,7 @@ using Cookify.Application.Expressions;
 using Cookify.Application.Services;
 using Cookify.Domain.Common.UnitOfWork;
 using Cookify.Domain.Exceptions;
+using Cookify.Domain.Exceptions.Users;
 using Cookify.Domain.Session;
 using Cookify.Domain.User;
 

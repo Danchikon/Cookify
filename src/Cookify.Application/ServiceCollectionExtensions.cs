@@ -18,12 +18,15 @@ public static class ServiceCollectionExtensions
         services.AddAsyncDisposingPipeline<CreateRecipeCommand, Guid>();
         services.AddTransactionPipeline<UploadCurrentUserAvatarCommand, string>();
         services.AddTransactionPipeline<CreateRecipeCommand, Guid>();
-
+        services.AddTransactionPipeline<DeleteCurrentUserAvatarCommand, Unit>();
+        
         return services;
     }
-    
+
+    #region Pipelines
+
     public static IServiceCollection AddTransactionPipeline<TCommand, TResponse>(this IServiceCollection services) 
-        where TCommand : CommandBase<TResponse>
+        where TCommand : CommandBase, IRequest<TResponse>
     {
        
         services.AddScoped(
@@ -32,9 +35,9 @@ public static class ServiceCollectionExtensions
         );
         return services;
     }
-    
+
     public static IServiceCollection AddAsyncDisposingPipeline<TCommand, TResponse>(this IServiceCollection services) 
-        where TCommand : CommandBase<TResponse>, IAsyncDisposable
+        where TCommand : CommandBase, IRequest<TResponse>, IAsyncDisposable
     {
        
         services.AddScoped(
@@ -43,4 +46,6 @@ public static class ServiceCollectionExtensions
         );
         return services;
     }
+    
+    #endregion
 }

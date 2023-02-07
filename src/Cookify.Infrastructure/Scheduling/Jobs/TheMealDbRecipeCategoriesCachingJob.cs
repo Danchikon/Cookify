@@ -23,7 +23,7 @@ public class TheMealDbRecipeCategoriesCachingJob : IJob
     private readonly IFileStorageService _fileStorageService;
     private readonly IInternetFileDownloaderService _internetFileDownloaderService;
     private readonly ILogger<TheMealDbRecipeCategoriesCachingJob> _logger;
-    private static readonly SemaphoreSlim SemaphoreSlim = new(15);
+    private static readonly SemaphoreSlim SemaphoreSlim = new(20);
 
     public TheMealDbRecipeCategoriesCachingJob(
         ITheMealDbApi theMealDbApi, 
@@ -94,7 +94,7 @@ public class TheMealDbRecipeCategoriesCachingJob : IJob
                 );
                 
                 var imageName = FileNameFormatter.FormatForRecipeCategoryImage(recipeCategoryEntity.Id);
-                var contentType = FileExtensionsParser.ParseFromLink(dto.ImageLink);
+                var contentType = ContentTypeParser.GetImageContentTypeFromLink(dto.ImageLink);
                 await _fileStorageService.PutFileAsync(new FileModel(imageStream, contentType, imageName), context.CancellationToken);
                 recipeCategoryEntity.ImageLink = _fileStorageService.GetFileLink(imageName);
 

@@ -7,7 +7,7 @@ public abstract record CommandBase : IRequest
     
 }
 
-public abstract record CommandBase<TResult> : IRequest<TResult>
+public abstract record CommandBase<TResult> : CommandBase, IRequest<TResult>
 {
     
 }

@@ -1,6 +1,6 @@
 using Cookify.Application.Services;
 
-namespace Cookify.Infrastructure.Services;
+namespace Cookify.Infrastructure.Services.Translation;
 
 public class FakeTextTranslationService : ITextTranslationService
 {

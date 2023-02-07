@@ -73,7 +73,7 @@ public class RecipePdfGeneratorJob : IJob
             var ukrainianPdfLink = await _fileStorageService.PutFileAsync(
                 new FileModel(
                     ukrainianPdf.Stream,
-                    FileExtensionsConstants.ApplicationPdf, 
+                    ContentTypesConstants.ApplicationPdf, 
                     ukrainianFileName
                     ), 
                 context.CancellationToken
@@ -82,7 +82,7 @@ public class RecipePdfGeneratorJob : IJob
             var pdfLink = await _fileStorageService.PutFileAsync(
                 new FileModel(
                     pdf.Stream, 
-                    FileExtensionsConstants.ApplicationPdf, 
+                    ContentTypesConstants.ApplicationPdf, 
                     fileName
                     ),
                 context.CancellationToken

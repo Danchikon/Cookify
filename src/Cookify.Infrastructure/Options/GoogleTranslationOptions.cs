@@ -1,6 +1,6 @@
 namespace Cookify.Infrastructure.Options;
 
-public class GoogleTranslationOptions
+public sealed record GoogleTranslationOptions
 {
     public const string SectionName = "GoogleTranslation";
 

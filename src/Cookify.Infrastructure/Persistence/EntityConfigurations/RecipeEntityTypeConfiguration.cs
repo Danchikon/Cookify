@@ -59,7 +59,6 @@ public class RecipeEntityTypeConfiguration : IEntityTypeConfiguration<RecipeEnti
         
         builder
             .Property(recipe => recipe.IsPublic)
-            .HasDefaultValue(true)
             .IsRequired();
         
         #endregion

@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{
 		.dockerignore = .dockerignore
 		src\Cookify.Api\cookify-376519-9f6e85ef9171.json = src\Cookify.Api\cookify-376519-9f6e85ef9171.json
 		.gitignore = .gitignore
+		docker-compose.yml = docker-compose.yml
+		.env = .env
 	EndProjectSection
 EndProject
 Global

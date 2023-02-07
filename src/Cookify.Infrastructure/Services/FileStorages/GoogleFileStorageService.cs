@@ -5,11 +5,13 @@ using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Cookify.Infrastructure.Services;
+namespace Cookify.Infrastructure.Services.FileStorages;
 
 public class GoogleFileStorageService : IFileStorageService
 {
-    private static readonly SemaphoreSlim SemaphoreSlim = new(5);
+    private static readonly object LockObject = new();
+    
+    private static Lazy<SemaphoreSlim> _semaphoreSlim = new();
     
     private readonly GoogleStorageOptions _options;
     private readonly Lazy<StorageClient> _storageClient;
@@ -24,13 +26,24 @@ public class GoogleFileStorageService : IFileStorageService
         _storageClient = storageClient;
         _options = options.Value;
         _logger = logger;
+        
+        lock (LockObject)
+        {
+            if (_semaphoreSlim.IsValueCreated)
+            {
+                return;
+            }
+            
+            _semaphoreSlim = new Lazy<SemaphoreSlim>(() => new SemaphoreSlim(_options.MaximumConcurrency));
+            var _ = _semaphoreSlim.Value;
+        }
     }
 
     public async Task<string> PutFileAsync(FileModel file, CancellationToken cancellationToken)
     {
         try
         {
-            await SemaphoreSlim.WaitAsync(cancellationToken);
+            await _semaphoreSlim.Value.WaitAsync(cancellationToken);
             
             _logger.LogInformation("Putting {FileName} file into google storage", file.Name);
             
@@ -49,7 +62,7 @@ public class GoogleFileStorageService : IFileStorageService
         }
         finally
         {
-            SemaphoreSlim.Release();
+            _semaphoreSlim.Value.Release();
         }
     }
 
@@ -58,16 +71,21 @@ public class GoogleFileStorageService : IFileStorageService
         return $"{_options.Url}/{_options.Bucket}/{fileName}";
     }
 
-    public async Task<FileModel> GetFileAsync(string fileName, CancellationToken cancellationToken)
-    {
-        var stream = new MemoryStream();
-        var file = await _storageClient.Value.DownloadObjectAsync(_options.Bucket, fileName, stream, cancellationToken: cancellationToken);
-        
-        return new FileModel(stream, file.ContentType, file.Name);
-    }
-
     public async Task RemoveFileAsync(string fileName, CancellationToken cancellationToken)
     {
-        await _storageClient.Value.DeleteObjectAsync(_options.Bucket, fileName, cancellationToken: cancellationToken);
+        try
+        {
+            await _semaphoreSlim.Value.WaitAsync(cancellationToken);
+            
+            _logger.LogInformation("Removing {FileName} file from google storage", fileName);
+            
+            await _storageClient.Value.DeleteObjectAsync(_options.Bucket, fileName, cancellationToken: cancellationToken);
+            
+            _logger.LogInformation("File {FileName} removed from google storage", fileName);
+        }
+        finally
+        {
+            _semaphoreSlim.Value.Release();
+        }
     }
 }

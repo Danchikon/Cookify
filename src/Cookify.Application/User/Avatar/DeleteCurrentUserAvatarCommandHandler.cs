@@ -31,15 +31,15 @@ public class DeleteCurrentUserAvatarCommandHandler : ICommandHandler<DeleteCurre
     public async Task<Unit> Handle(DeleteCurrentUserAvatarCommand command, CancellationToken cancellationToken)
     {
         var userId = _currentUserService.GetUserId();
-        var fileName = FileNameFormatter.FormatForUserAvatar(userId); 
-        
-        await _fileStorageService.RemoveFileAsync(fileName, cancellationToken);
-        
+
         var partialUser = new PartialEntity<UserEntity>()
             .AddValue(user => user.AvatarImageLink, null);
         
         await _usersRepository.PartiallyUpdateAsync(userId, partialUser, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        var fileName = FileNameFormatter.FormatForUserAvatar(userId);
+        await _fileStorageService.RemoveFileAsync(fileName, cancellationToken);
 
         return Unit.Value;
     }

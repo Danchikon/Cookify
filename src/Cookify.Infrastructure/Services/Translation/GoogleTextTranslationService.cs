@@ -1,9 +1,8 @@
 using Cookify.Application.Services;
 using Google.Cloud.Translation.V2;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
-namespace Cookify.Infrastructure.Services;
+namespace Cookify.Infrastructure.Services.Translation;
 
 public class GoogleTextTranslationService : ITextTranslationService
 {

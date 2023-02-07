@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Cookify.Application.Common.Dtos;
+using Cookify.Domain.Common.Enums;
+using Cookify.Domain.Common.Exceptions;
 using Cookify.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +14,13 @@ public static class ExceptionToObjectResultConverter
 
     public static ObjectResult Convert(Exception exception)
     {
-        var code = exception switch
+        var statusCode = exception switch
         {
-            UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+            UnauthorizedException => HttpStatusCode.Unauthorized,
+            UnauthenticatedException => HttpStatusCode.Unauthorized,
             NotImplementedException => HttpStatusCode.NotImplemented,
             InvalidOperationException => HttpStatusCode.Conflict,
+            AlreadyExistsException => HttpStatusCode.Conflict,
             ArgumentException => HttpStatusCode.BadRequest,
             ValidationException => HttpStatusCode.BadRequest,
             NotFoundException => HttpStatusCode.NotFound,
@@ -25,17 +29,27 @@ public static class ExceptionToObjectResultConverter
 
         var errors = new List<string> { exception.Message };
 
-        if (exception.InnerException is not null)
+        var innerException = exception.InnerException;
+        while (innerException is not null)
         {
-            errors.Add(exception.InnerException.Message);
+            errors.Add(innerException.Message);
+            innerException = innerException.InnerException;
+        }
+
+        var errorCode = (int)statusCode;
+
+        if (exception is BusinessExceptionBase businessExceptionBase)
+        {
+            errorCode = (int)businessExceptionBase.Code;
         }
 
         var error = new ErrorDto
         {
             Title = exception.GetType().Name,
-            Messages = errors
+            Messages = errors,
+            Code = errorCode
         };
 
-        return new ObjectResult(error) { StatusCode = (int)code };
+        return new ObjectResult(error) { StatusCode = (int)statusCode };
     }
 }

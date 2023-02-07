@@ -1,3 +1,4 @@
+using Cookify.Domain.Common.Exceptions;
 using Cookify.Domain.Exceptions;
 using Cookify.Domain.IngredientUser;
 using Cookify.Infrastructure.Persistence;

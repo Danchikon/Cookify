@@ -5,6 +5,7 @@ using Cookify.Infrastructure.Common.Seeders;
 using Cookify.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Minio;
 
 namespace Cookify.Api.Extensions;
 
@@ -48,8 +49,10 @@ public static class ApplicationBuilderExtensions
     }
     
     #endregion
-    
-    public static async Task<IApplicationBuilder> UseDatabaseAsync<TDbContext>(this IApplicationBuilder builder, CancellationToken cancellationToken) 
+
+    #region Entity Framework Database
+
+    public static async Task<IApplicationBuilder> UseEfDatabaseAsync<TDbContext>(this IApplicationBuilder builder, CancellationToken cancellationToken) 
         where TDbContext : DbContext
     {
         var options = builder.ApplicationServices.GetRequiredService<IOptions<EfDatabaseOptions>>().Value;
@@ -77,5 +80,32 @@ public static class ApplicationBuilderExtensions
         return builder;
     }
     
-    
+    #endregion
+
+    #region Minio Storage
+
+    public static async Task<IApplicationBuilder> UseMinioStorageAsync(this IApplicationBuilder builder, CancellationToken cancellationToken)
+    {
+        var options = builder.ApplicationServices.GetRequiredService<IOptions<MinioStorageOptions>>().Value;
+        var serviceScopeFactory = builder.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+        await using var serviceScope = serviceScopeFactory.CreateAsyncScope();
+        using var minioClient = serviceScope.ServiceProvider.GetRequiredService<IMinioClient>();
+
+        var existsArgs = new BucketExistsArgs().WithBucket(options.Bucket);
+        
+        var isBucketExists = await minioClient.BucketExistsAsync(existsArgs, cancellationToken);
+
+        if (isBucketExists)
+        {
+            return builder;
+        }
+        
+        var makeArgs = new MakeBucketArgs().WithBucket(options.Bucket);
+
+        await minioClient.MakeBucketAsync(makeArgs, cancellationToken);
+
+        return builder;
+    }
+
+    #endregion
 }

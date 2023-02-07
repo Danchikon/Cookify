@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Cookify.Domain.Common.Entities;
+using Cookify.Domain.Common.Exceptions;
 using Cookify.Domain.Common.Pagination;
 using Cookify.Domain.Common.Repositories;
 using Cookify.Domain.Exceptions;

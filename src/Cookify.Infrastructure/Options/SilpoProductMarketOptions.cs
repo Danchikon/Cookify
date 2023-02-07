@@ -1,6 +1,6 @@
 namespace Cookify.Infrastructure.Options;
 
-public record SilpoProductMarketOptions
+public sealed record SilpoProductMarketOptions
 {
     public const string SectionName = "SilpoProductMarket";
 

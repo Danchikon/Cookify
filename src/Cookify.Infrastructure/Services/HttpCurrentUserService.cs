@@ -1,7 +1,9 @@
 using Cookify.Application.Common.Constants;
 using Cookify.Application.Dtos.Authentication;
 using Cookify.Application.Services;
+using Cookify.Domain.Common.Exceptions;
 using Cookify.Domain.Exceptions;
+using Cookify.Domain.Exceptions.Users;
 using Microsoft.AspNetCore.Http;
 
 namespace Cookify.Infrastructure.Services;

@@ -1,10 +1,11 @@
+using Cookify.Domain.Common.Enums;
 using Cookify.Domain.Common.Exceptions;
 
-namespace Cookify.Domain.Exceptions;
+namespace Cookify.Domain.Exceptions.Users;
 
-public class UserAlreadyExistsException : BusinessExceptionBase
+public class UserAlreadyExistsException : AlreadyExistsException
 {
-    private UserAlreadyExistsException(string message) : base(message)
+    private UserAlreadyExistsException(string message) : base(message, ErrorCode.UserAlreadyExists)
     {
     }
 

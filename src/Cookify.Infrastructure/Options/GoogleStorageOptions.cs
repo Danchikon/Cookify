@@ -10,4 +10,5 @@ public sealed record GoogleStorageOptions
     public string Url { get; init; } = null!;
     public string CredentialFileJson { get; init; } = null!;
     public string Bucket { get; init; } = null!;
+    public int MaximumConcurrency { get; init; }
 }

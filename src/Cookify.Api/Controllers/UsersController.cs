@@ -64,6 +64,7 @@ public class UsersController : ApiControllerBase
         OperationId = nameof(DeleteCurrentUserSessionAsync)
     )]
     [SwaggerResponse(StatusCodes.Status204NoContent, "Current user session has been successfully deleted")]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized", typeof(ErrorDto))]
     public async Task<IActionResult> DeleteCurrentUserSessionAsync(CancellationToken cancellationToken)
     {
         await Mediator.Send(new DeleteCurrentUserSessionCommand(), cancellationToken);
@@ -77,7 +78,8 @@ public class UsersController : ApiControllerBase
         Description = "Registers user",
         OperationId = nameof(RegisterAsync)
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "User has been successfully registered")]
+    [SwaggerResponse(StatusCodes.Status200OK, "User has been successfully registered", typeof(JsonWebTokenDto))]
+    [SwaggerResponse(StatusCodes.Status409Conflict, "Conflict operation", typeof(ErrorDto))]
     public async Task<IActionResult> RegisterAsync(
         [FromBody, SwaggerRequestBody(Required = true)] RegisterUserCommand command,
         CancellationToken cancellationToken
@@ -94,7 +96,7 @@ public class UsersController : ApiControllerBase
         OperationId = nameof(GetCurrentUserShortInfoAsync)
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Current user short info has been successfully returned", typeof(UserShortInfoDto))]
-    [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized")]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized", typeof(ErrorDto))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "User not found", typeof(ErrorDto))]
     public async Task<IActionResult> GetCurrentUserShortInfoAsync(CancellationToken cancellationToken)
     {

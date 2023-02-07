@@ -6,7 +6,7 @@ using GraphQL;
 using GraphQL.Client.Abstractions;
 using Microsoft.Extensions.Options;
 
-namespace Cookify.Infrastructure.Services;
+namespace Cookify.Infrastructure.Services.ProductMarkets;
 
 public class SilpoProductMarketService : IProductMarketService
 { 

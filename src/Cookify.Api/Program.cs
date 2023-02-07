@@ -1,6 +1,9 @@
+using System.Net;
 using Cookify.Api.Extensions;
 using Cookify.Application;
+using Cookify.Domain.Common.Exceptions;
 using Cookify.Infrastructure;
+using Cookify.Infrastructure.Common.Helpers;
 using Cookify.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,9 +18,18 @@ builder.Services.AddInfrastructureServices();
 
 var app = builder.Build();
 
-await app.UseDatabaseAsync<CookifyDbContext>(default);
+await app.UseEfDatabaseAsync<CookifyDbContext>(default);
 
-app.UseErrorHandlerMiddleware();
+if (!AspNetCoreEnvironment.IsProduction)
+{
+    await app.UseMinioStorageAsync(default);
+}
+
+app.UseErrorHandlerMiddleware(exception => exception switch
+{
+    BusinessExceptionBase => HttpStatusCode.Conflict,
+    _ => HttpStatusCode.InternalServerError
+});
 
 app.UseResponseCompression();
 

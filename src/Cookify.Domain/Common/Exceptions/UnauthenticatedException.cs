@@ -1,10 +1,10 @@
-using Cookify.Domain.Common.Exceptions;
+using Cookify.Domain.Common.Enums;
 
-namespace Cookify.Domain.Exceptions;
+namespace Cookify.Domain.Common.Exceptions;
 
 public class UnauthenticatedException : BusinessExceptionBase
 {
-    private UnauthenticatedException(string message) : base(message)
+    private UnauthenticatedException(string message) : base(message, ErrorCode.Unauthenticated)
     {
     }
     

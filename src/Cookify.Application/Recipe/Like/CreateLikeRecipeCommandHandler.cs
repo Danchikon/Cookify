@@ -1,5 +1,6 @@
 using Cookify.Application.Common.Cqrs;
 using Cookify.Application.Services;
+using Cookify.Domain.Common.Exceptions;
 using Cookify.Domain.Common.UnitOfWork;
 using Cookify.Domain.Exceptions;
 using Cookify.Domain.Like;

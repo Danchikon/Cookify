@@ -344,3 +344,6 @@ C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Api\obj\Debug\net6.0\refint
 C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Api\obj\Debug\net6.0\Cookify.Api.pdb
 C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Api\obj\Debug\net6.0\Cookify.Api.genruntimeconfig.cache
 C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Api\obj\Debug\net6.0\ref\Cookify.Api.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Api\bin\Debug\net6.0\Crc32.NET.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Api\bin\Debug\net6.0\Minio.dll
+C:\Users\patik\RiderProjects\MealRecipes\src\Cookify.Api\bin\Debug\net6.0\System.Reactive.Linq.dll

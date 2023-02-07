@@ -2,6 +2,7 @@ using Cookify.Application.Services;
 using Cookify.Domain.Common.UnitOfWork;
 using Cookify.Domain.Ingredient;
 using Cookify.Infrastructure.Services;
+using Cookify.Infrastructure.Services.ProductMarkets;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
