@@ -6,6 +6,7 @@ using Cookify.Application.Dtos.Recipe;
 using Cookify.Application.Dtos.RecipeCategory;
 using Cookify.Application.Recipe;
 using Cookify.Application.Recipe.Favorite;
+using Cookify.Application.Recipe.Ingredient;
 using Cookify.Application.Recipe.Like;
 using Cookify.Application.RecipeCategory;
 using Cookify.Domain.Common.Pagination;
@@ -64,6 +65,28 @@ public class RecipesController : ApiControllerBase
         };
         
         return Ok(await Mediator.Send(command, cancellationToken));
+    }
+    
+    [Authorize]
+    [HttpPost("{recipeId:guid}/ingredients/{ingredientId:guid}")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [SwaggerOperation(
+        Summary = "Adds ingredient to recipe",
+        Description = "Requires authenticated user",
+        OperationId = nameof(AddIngredientToRecipeAsync)
+    )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, "Ingredients has been successfully added to recipe", typeof(Guid))]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized", typeof(ErrorDto))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Recipe or ingredient not found", typeof(ErrorDto))]
+    public async Task<IActionResult> AddIngredientToRecipeAsync(
+        Guid recipeId,
+        Guid ingredientId,
+        [FromBody] string ukrainianMeasure,
+        CancellationToken cancellationToken
+    )
+    {
+        await Mediator.Send(new AddIngredientToRecipeCommand(ingredientId, recipeId, ukrainianMeasure), cancellationToken);
+        return NoContent();
     }
     
     [Authorize]

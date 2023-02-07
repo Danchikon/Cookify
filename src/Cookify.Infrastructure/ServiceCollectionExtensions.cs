@@ -4,6 +4,7 @@ using Cookify.Application.Services;
 using Cookify.Domain.Common.UnitOfWork;
 using Cookify.Domain.Favorite;
 using Cookify.Domain.Ingredient;
+using Cookify.Domain.IngredientRecipe;
 using Cookify.Domain.IngredientUser;
 using Cookify.Domain.Like;
 using Cookify.Domain.MealCategory;
@@ -213,6 +214,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IFavoritesRepository, FavoritesRepository>();
         services.AddScoped<ILikesRepository, LikesRepository>();
         services.AddScoped<IIngredientUsersRepository, IngredientUsersRepository>();
+        services.AddScoped<IIngredientRecipesRepository, IngredientRecipesRepository>();
         
         return services;
     }
