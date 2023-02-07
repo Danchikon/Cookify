@@ -33,12 +33,13 @@ public class DeleteCurrentUserAvatarCommandHandler : ICommandHandler<DeleteCurre
         var userId = _currentUserService.GetUserId();
         var fileName = FileNameFormatter.FormatForUserAvatar(userId); 
         
-        await _fileStorageService.RemoveFileAsync(fileName);
+        await _fileStorageService.RemoveFileAsync(fileName, cancellationToken);
         
-        var partialUser = new PartialEntity<UserEntity>();
-        partialUser.AddValue(user => user.AvatarImageLink, null);
-        await _usersRepository.PartiallyUpdateAsync(userId, partialUser);
-        await _unitOfWork.SaveChangesAsync();
+        var partialUser = new PartialEntity<UserEntity>()
+            .AddValue(user => user.AvatarImageLink, null);
+        
+        await _usersRepository.PartiallyUpdateAsync(userId, partialUser, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

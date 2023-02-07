@@ -25,9 +25,11 @@ public class GetCurrentUserQueryHandler : IQueryHandler<GetCurrentUserQuery, Use
 
         var user = await _usersRepository.FirstAsync<UserDto>(userId, new []
         {
+            UserExpressions.Recipes(),
+            UserExpressions.Likes(),
             UserExpressions.Favorites(),
             UserExpressions.IngredientUsers()
-        });
+        }, cancellationToken);
         
         return user;
     }

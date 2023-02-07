@@ -27,6 +27,16 @@ public static class UserExpressions
         return user => user.Favorites;
     }
     
+    public static Expression<Func<UserEntity, object?>> Recipes()
+    {
+        return user => user.Recipes;
+    }
+    
+    public static Expression<Func<UserEntity, object?>> Likes()
+    {
+        return user => user.Likes;
+    }
+    
     public static Expression<Func<UserEntity, object?>> IngredientUsers()
     {
         return user => user.IngredientUsers;

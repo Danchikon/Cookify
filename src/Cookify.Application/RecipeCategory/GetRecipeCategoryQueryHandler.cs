@@ -15,7 +15,7 @@ public record GetRecipeCategoryQueryHandler : IQueryHandler<GetRecipeCategoryQue
     
     public async Task<RecipeCategoryDto> Handle(GetRecipeCategoryQuery query, CancellationToken cancellationToken)
     {
-        var recipeCategory = await _recipeCategoriesRepository.FirstAsync<RecipeCategoryDto>(query.Id);
+        var recipeCategory = await _recipeCategoriesRepository.FirstAsync<RecipeCategoryDto>(query.Id, cancellationToken: cancellationToken);
 
         return recipeCategory;
     }

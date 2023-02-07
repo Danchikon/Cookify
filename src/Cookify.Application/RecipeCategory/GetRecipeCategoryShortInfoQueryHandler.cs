@@ -15,7 +15,7 @@ public record GetRecipeCategoryShortInfoQueryHandler : IQueryHandler<GetRecipeCa
     
     public async Task<RecipeCategoryShortInfoDto> Handle(GetRecipeCategoryShortInfoQuery query, CancellationToken cancellationToken)
     {
-        var recipeCategory = await _recipeCategoriesRepository.FirstAsync<RecipeCategoryShortInfoDto>(query.Id);
+        var recipeCategory = await _recipeCategoriesRepository.FirstAsync<RecipeCategoryShortInfoDto>(query.Id, cancellationToken: cancellationToken);
 
         return recipeCategory;
     }

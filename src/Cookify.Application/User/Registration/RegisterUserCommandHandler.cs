@@ -28,14 +28,14 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, J
     
     public async Task<JsonWebTokenDto> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
     {
-        var userAlreadyExists = await _userRepository.AnyAsync(UserExpressions.UsernameEquals(command.Username));
+        var userAlreadyExists = await _userRepository.AnyAsync(UserExpressions.UsernameEquals(command.Username), cancellationToken);
         
         if (userAlreadyExists)
         {
             throw UserAlreadyExistsException.CreateForUsername(command.Username);
         }
         
-        userAlreadyExists = await _userRepository.AnyAsync(UserExpressions.EmailEquals(command.Email));
+        userAlreadyExists = await _userRepository.AnyAsync(UserExpressions.EmailEquals(command.Email), cancellationToken);
         
         if (userAlreadyExists)
         {
@@ -56,8 +56,8 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, J
         user.Session = session;
         user.SessionId = session.Id;
 
-        await _userRepository.AddAsync(user);
-        await _unitOfWork.SaveChangesAsync();
+        await _userRepository.AddAsync(user, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         return _authenticationService.AuthenticateUser(user, refreshToken);
     }

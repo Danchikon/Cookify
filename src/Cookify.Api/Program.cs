@@ -15,7 +15,7 @@ builder.Services.AddInfrastructureServices();
 
 var app = builder.Build();
 
-await app.UseDatabaseAsync<CookifyDbContext>();
+await app.UseDatabaseAsync<CookifyDbContext>(default);
 
 app.UseErrorHandlerMiddleware();
 
@@ -37,7 +37,3 @@ app.UseSwagger();
 app.MapControllers();
 
 await app.RunAsync();
-
-
-
-var Бандера = new {};

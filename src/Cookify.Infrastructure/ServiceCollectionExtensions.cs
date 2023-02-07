@@ -45,6 +45,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<ICurrentUserService, HttpCurrentUserService>();
+        services.AddScoped<Lazy<ICurrentUserService>>(provider => new Lazy<ICurrentUserService>(provider.GetRequiredService<ICurrentUserService>));
         services.AddScoped<IBrowsingContext>(_ => BrowsingContext.New(Configuration.Default.WithDefaultLoader()));
         services.AddScoped<IImageSearcherService, GoogleImageSearcherService>();
         services.AddInternetFileDownloader();
@@ -52,7 +53,8 @@ public static class ServiceCollectionExtensions
         services.AddSilpoProductMarket();
         services.AddIronPdf();
         services.AddGoogleFileStorage();
-        services.AddGoogleTextTranslation();
+        // services.AddGoogleTextTranslation();
+        services.AddScoped<ITextTranslationService, FakeTextTranslationService>();
         services.AddQuartzScheduling();
         services.AddEfPostgres();
         services.AddSeeders();

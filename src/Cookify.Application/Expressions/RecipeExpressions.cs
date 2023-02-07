@@ -27,6 +27,11 @@ public static class RecipeExpressions
         return recipe => recipe.IngredientRecipes;
     }
     
+    public static Expression<Func<RecipeEntity, bool>> IsPublicEquals(bool? isPublic)
+    {
+        return recipe => isPublic == null || recipe.IsPublic == isPublic;
+    }
+    
     public static Expression<Func<RecipeEntity, bool>> TitleEquals(string? name)
     {
         return recipe => name == null || recipe.Title.ToLower() == name.ToLower();

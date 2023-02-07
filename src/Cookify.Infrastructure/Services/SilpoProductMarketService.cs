@@ -19,7 +19,7 @@ public class SilpoProductMarketService : IProductMarketService
         _options = options.Value;
     }
     
-    public async Task<MarketProductModel?> GetProductAsync(string productName)
+    public async Task<MarketProductModel?> GetProductAsync(string productName, CancellationToken cancellationToken)
     {
         var productRequest = new GraphQLRequest { 
             Query = @"{
@@ -33,7 +33,7 @@ public class SilpoProductMarketService : IProductMarketService
             Variables = new { productName }
         };
 
-        var response = await _graphQlClient.SendQueryAsync<ResponseData>(productRequest);
+        var response = await _graphQlClient.SendQueryAsync<ResponseData>(productRequest, cancellationToken);
 
         if (response.Data.Search?.Paging?.Count is 0 or null)
         {

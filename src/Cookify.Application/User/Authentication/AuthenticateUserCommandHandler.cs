@@ -34,8 +34,9 @@ public class AuthenticateUserCommandHandler : ICommandHandler<AuthenticateUserCo
     {
         var user = await _userRepository.FirstOrDefaultAsync(
             expression: UserExpressions.UsernameEquals(command.Username),
-            include: UserExpressions.Session()
-        );
+            include: UserExpressions.Session(), 
+            cancellationToken: cancellationToken
+            );
         
         if (user is null)
         {
@@ -49,10 +50,10 @@ public class AuthenticateUserCommandHandler : ICommandHandler<AuthenticateUserCo
 
         if (user.Session is not null)
         {
-            await _sessionRepository.RemoveAsync(user.Session.Id, false);
+            await _sessionRepository.RemoveAsync(user.Session.Id, false, cancellationToken);
             user.SessionId = null;
             user.Session = null;
-            await _userRepository.UpdateAsync(user);
+            await _userRepository.UpdateAsync(user, cancellationToken);
         }
         
         var refreshToken = _authenticationService.GenerateRefreshToken();
@@ -60,9 +61,9 @@ public class AuthenticateUserCommandHandler : ICommandHandler<AuthenticateUserCo
         var session = new SessionEntity(refreshTokenHash, user.Id, DateTimeOffset.UtcNow.AddMonths(12));
         user.SessionId = session.Id;
         
-        await _sessionRepository.AddAsync(session);
-        await _userRepository.UpdateAsync(user);
-        await _unitOfWork.SaveChangesAsync();
+        await _sessionRepository.AddAsync(session, cancellationToken);
+        await _userRepository.UpdateAsync(user, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         return _authenticationService.AuthenticateUser(user, refreshToken);
     }

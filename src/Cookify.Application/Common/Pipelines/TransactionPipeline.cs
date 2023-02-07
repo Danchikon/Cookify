@@ -14,18 +14,21 @@ public class TransactionPipeline<TCommand, TResponse> : IPipelineBehavior<TComma
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<TResponse> Handle(TCommand request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(TCommand command, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         try
         {
-            await _unitOfWork.StartTransactionAsync();
+            await using var _ = await _unitOfWork.StartTransactionAsync(cancellationToken);
+            
             var result = await next();
-            await _unitOfWork.CommitTransactionAsync();
+            
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            
             return result;
         }
         catch (Exception) 
         {
-            await _unitOfWork.RollbackTransactionAsync();
+            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
             throw;
         }
     }

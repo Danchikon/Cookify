@@ -38,12 +38,12 @@ public class RecipePdfGeneratorJob : IJob
     
     public async Task Execute(IJobExecutionContext context)
     {
-        var recipes = await _recipesRepository.WherePdfLinkIsNullAsync();
+        var recipes = await _recipesRepository.WherePdfLinkIsNullAsync(context.CancellationToken);
         
         var ukrainianTemplatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, PdfTemplatesConstants.RecipeUkrainianPdfTemplatePath);
         var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, PdfTemplatesConstants.RecipePdfTemplatePath);
-        var template = Handlebars.Compile(await File.ReadAllTextAsync(templatePath, Encoding.UTF8));
-        var ukrainianTemplate = Handlebars.Compile(await File.ReadAllTextAsync(ukrainianTemplatePath, Encoding.UTF8));
+        var template = Handlebars.Compile(await File.ReadAllTextAsync(templatePath, Encoding.UTF8, context.CancellationToken));
+        var ukrainianTemplate = Handlebars.Compile(await File.ReadAllTextAsync(ukrainianTemplatePath, Encoding.UTF8, context.CancellationToken));
 
         foreach (var recipeEntity in recipes)
         {
@@ -70,23 +70,30 @@ public class RecipePdfGeneratorJob : IJob
             var ukrainianFileName = FileNameFormatter.FormatForRecipeUkrainianPdf(recipeEntity.Id);
             var fileName = FileNameFormatter.FormatForRecipePdf(recipeEntity.Id);
             
-            var ukrainianPdfLink = await _fileStorageService.PutFileAsync(new FileModel(
-                ukrainianPdf.Stream, 
-                FileExtensionsConstants.ApplicationPdf,
-                ukrainianFileName)
+            var ukrainianPdfLink = await _fileStorageService.PutFileAsync(
+                new FileModel(
+                    ukrainianPdf.Stream,
+                    FileExtensionsConstants.ApplicationPdf, 
+                    ukrainianFileName
+                    ), 
+                context.CancellationToken
+                );
+            
+            var pdfLink = await _fileStorageService.PutFileAsync(
+                new FileModel(
+                    pdf.Stream, 
+                    FileExtensionsConstants.ApplicationPdf, 
+                    fileName
+                    ),
+                context.CancellationToken
             );
             
-            var pdfLink = await _fileStorageService.PutFileAsync(new FileModel(
-                pdf.Stream, 
-                FileExtensionsConstants.ApplicationPdf, 
-                fileName)
-            );
-            
-            var partialRecipe = new PartialEntity<RecipeEntity>();
-            partialRecipe.AddValue(recipe => recipe.UkrainianPdfLink, ukrainianPdfLink);
-            partialRecipe.AddValue(recipe => recipe.PdfLink, pdfLink);
-            await _recipesRepository.PartiallyUpdateAsync(recipeEntity.Id, partialRecipe);
-            await _unitOfWork.SaveChangesAsync();
+            var partialRecipe = new PartialEntity<RecipeEntity>()
+                .AddValue(recipe => recipe.UkrainianPdfLink, ukrainianPdfLink)
+                .AddValue(recipe => recipe.PdfLink, pdfLink);
+
+            await _recipesRepository.PartiallyUpdateAsync(recipeEntity.Id, partialRecipe, context.CancellationToken);
+            await _unitOfWork.SaveChangesAsync(context.CancellationToken);
         }
     }
 }

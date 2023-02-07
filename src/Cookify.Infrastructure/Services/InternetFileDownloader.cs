@@ -17,11 +17,11 @@ public class InternetFileDownloaderService : IInternetFileDownloaderService
         _logger = logger;
     }
     
-    public async Task<Stream> DownloadAsync(Uri path)
+    public async Task<Stream> DownloadAsync(Uri path, CancellationToken cancellationToken)
     {
         try
         {
-            await SemaphoreSlim.WaitAsync();
+            await SemaphoreSlim.WaitAsync(cancellationToken);
 
             _logger.LogInformation("Downloading {Url}", path.ToString());
             

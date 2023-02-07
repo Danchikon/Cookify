@@ -24,7 +24,9 @@ public class GetCurrentUserQueryShortInfoHandler : IQueryHandler<GetCurrentUserS
 
         var user = await _usersRepository.FirstAsync<UserShortInfoDto>(userId, new []
         {
-            UserExpressions.Favorites()
+            UserExpressions.Likes(),
+            UserExpressions.Favorites(),
+            UserExpressions.IngredientUsers()
         });
         
         return user;

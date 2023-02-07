@@ -16,12 +16,12 @@ public record GetRecipeCategoryShortInfosListQueryHandler : IQueryHandler<GetRec
     
     public async Task<IList<RecipeCategoryShortInfoDto>> Handle(GetRecipeCategoryShortInfosListQuery query, CancellationToken cancellationToken)
     {
-        var recipeCategoriesList = await _recipeCategoriesRepository.WhereAsync<RecipeCategoryShortInfoDto>(
+        var recipeCategoriesList = await _recipeCategoriesRepository.WhereAsync<RecipeCategoryShortInfoDto>(new [] { 
             RecipeCategoryExpressions.NameEquals(query.NameEquals), 
             RecipeCategoryExpressions.NameContains(query.NameContains),
             RecipeCategoryExpressions.UkrainianNameEquals(query.UkrainianNameEquals), 
-            RecipeCategoryExpressions.UkrainianNameContains(query.UkrainianNameContains)
-        );
+            RecipeCategoryExpressions.UkrainianNameContains(query.UkrainianNameContains) 
+        }, cancellationToken);
 
         return recipeCategoriesList;
     }

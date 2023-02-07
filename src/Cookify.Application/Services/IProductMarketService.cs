@@ -4,5 +4,5 @@ namespace Cookify.Application.Services;
 
 public interface IProductMarketService
 {
-    Task<MarketProductModel?> GetProductAsync(string productName);
+    Task<MarketProductModel?> GetProductAsync(string productName, CancellationToken cancellationToken);
 }

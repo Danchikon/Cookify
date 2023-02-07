@@ -31,10 +31,13 @@ public record DeleteFavoriteRecipeCommandHandler : ICommandHandler<DeleteFavorit
     public async Task<Unit> Handle(DeleteFavoriteRecipeCommand command, CancellationToken cancellationToken)
     { 
         var userId = _currentUserService.GetUserId();
-        var favorite = await _favoritesRepository.FirstAsync(FavoriteExpressions.RecipeIdAndCreatedByEquals(command.RecipeId, userId));
+        var favorite = await _favoritesRepository.FirstAsync(
+            FavoriteExpressions.RecipeIdAndCreatedByEquals(command.RecipeId, userId), 
+            cancellationToken: cancellationToken
+            );
 
-        await _favoritesRepository.RemoveAsync(favorite.Id, false); 
-        await _unitOfWork.SaveChangesAsync();
+        await _favoritesRepository.RemoveAsync(favorite.Id, false, cancellationToken); 
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         return Unit.Value;
     }

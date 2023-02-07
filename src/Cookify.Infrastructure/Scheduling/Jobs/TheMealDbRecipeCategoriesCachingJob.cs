@@ -46,12 +46,13 @@ public class TheMealDbRecipeCategoriesCachingJob : IJob
     
     public async Task Execute(IJobExecutionContext context)
     {
-        var responseDto = await _theMealDbApi.GetRecipeCategoriesAsync();
+        var responseDto = await _theMealDbApi.GetRecipeCategoriesAsync(context.CancellationToken);
 
         var existedCategories = await _recipeCategoriesRepository.WhereAsync(new []
         {
             RecipeCategoryExpressions.CreateByEquals(null, false)
-        });
+        }, cancellationToken: context.CancellationToken);
+        
         var existedCategoriesNames = existedCategories.Select(category => category.Name.ToLower());
         var missingCategories = responseDto.Categories.Where(dto => !existedCategoriesNames.Contains(dto.Name.ToLower())).ToArray();
 
@@ -59,15 +60,16 @@ public class TheMealDbRecipeCategoriesCachingJob : IJob
         {
             try
             {
-                await SemaphoreSlim.WaitAsync();
+                await SemaphoreSlim.WaitAsync(context.CancellationToken);
                 
                 var translateNameAsyncTask = _textTranslationService.TranslateAsync( 
                     sourceText: dto.Name, 
                     sourceLanguage: TranslatingConstants.EnglishLanguage, 
-                    targetLanguage: TranslatingConstants.UkrainianLanguage
+                    targetLanguage: TranslatingConstants.UkrainianLanguage,
+                    cancellationToken: context.CancellationToken
                     );
                 
-                var downloadAsyncTask = _internetFileDownloaderService.DownloadAsync(new Uri(dto.ImageLink));
+                var downloadAsyncTask = _internetFileDownloaderService.DownloadAsync(new Uri(dto.ImageLink), context.CancellationToken);
                 Task<string>? translateDescriptionAsyncTask = null;
 
                 if (!string.IsNullOrWhiteSpace(dto.Description))
@@ -75,7 +77,8 @@ public class TheMealDbRecipeCategoriesCachingJob : IJob
                     translateDescriptionAsyncTask = _textTranslationService.TranslateAsync( 
                         sourceText: dto.Description, 
                         sourceLanguage: TranslatingConstants.EnglishLanguage, 
-                        targetLanguage: TranslatingConstants.UkrainianLanguage
+                        targetLanguage: TranslatingConstants.UkrainianLanguage,
+                        cancellationToken: context.CancellationToken
                         );
                 }
 
@@ -92,7 +95,7 @@ public class TheMealDbRecipeCategoriesCachingJob : IJob
                 
                 var imageName = FileNameFormatter.FormatForRecipeCategoryImage(recipeCategoryEntity.Id);
                 var contentType = FileExtensionsParser.ParseFromLink(dto.ImageLink);
-                await _fileStorageService.PutFileAsync(new FileModel(imageStream, contentType, imageName));
+                await _fileStorageService.PutFileAsync(new FileModel(imageStream, contentType, imageName), context.CancellationToken);
                 recipeCategoryEntity.ImageLink = _fileStorageService.GetFileLink(imageName);
 
                 return recipeCategoryEntity;
@@ -107,8 +110,8 @@ public class TheMealDbRecipeCategoriesCachingJob : IJob
 
         try
         {
-            await _recipeCategoriesRepository.AddRangeAsync(categories);
-            await _unitOfWork.SaveChangesAsync();
+            await _recipeCategoriesRepository.AddRangeAsync(categories, context.CancellationToken);
+            await _unitOfWork.SaveChangesAsync(context.CancellationToken);
         }
         catch (Exception exception)
         {

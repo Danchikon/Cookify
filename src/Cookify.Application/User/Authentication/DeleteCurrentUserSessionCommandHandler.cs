@@ -35,18 +35,18 @@ public class DeleteCurrentUserSessionCommandHandler : ICommandHandler<DeleteCurr
     {
         var userId = _currentUserService.GetUserId();
         
-        var user = await _userRepository.FirstAsync(userId, UserExpressions.Session());
+        var user = await _userRepository.FirstAsync(userId, UserExpressions.Session(), cancellationToken);
 
         if (user.Session is null)
         {
             return Unit.Value;
         }
         
-        await _sessionRepository.RemoveAsync(user.Session.Id, false);
+        await _sessionRepository.RemoveAsync(user.Session.Id, false, cancellationToken);
         user.SessionId = null;
         user.Session = null;
-        await _userRepository.UpdateAsync(user);
-        await _unitOfWork.SaveChangesAsync();
+        await _userRepository.UpdateAsync(user, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

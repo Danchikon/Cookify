@@ -5,5 +5,9 @@ using Cookify.Domain.Common.Pagination;
 
 namespace Cookify.Application.Recipe;
 
-public record GetRandomRecipeShortInfosQuery(Guid? CategoryIdEquals, uint PageSize = PaginationOptions.DefaultPageSize) 
+public record GetRandomRecipeShortInfosQuery(
+        Guid? CategoryIdEquals = null, 
+        uint PageSize = PaginationOptions.DefaultPageSize,
+        bool? IsPublicEquals = null
+        ) 
     : QueryBase<IPaginatedList<RecipeShortInfoDto>>;

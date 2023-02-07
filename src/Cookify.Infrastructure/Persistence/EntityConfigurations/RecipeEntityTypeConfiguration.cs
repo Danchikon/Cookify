@@ -57,6 +57,11 @@ public class RecipeEntityTypeConfiguration : IEntityTypeConfiguration<RecipeEnti
             .Property(recipe => recipe.UkrainianPdfLink)
             .HasDefaultValue(null);
         
+        builder
+            .Property(recipe => recipe.IsPublic)
+            .HasDefaultValue(true)
+            .IsRequired();
+        
         #endregion
         
         builder.HasIndex(recipe => recipe.Title);

@@ -32,24 +32,31 @@ public record CreateOrUpdateIngredientUserCommandHandler : ICommandHandler<Creat
     {
         var userId = _currentUserService.GetUserId();
         
-        if (!await _ingredientsRepository.AnyAsync(command.IngredientId))
+        if (!await _ingredientsRepository.AnyAsync(command.IngredientId, cancellationToken))
         {
             throw NotFoundException.Create<IngredientEntity>(command.IngredientId);
         }
 
-        var ingredientUser = await _ingredientUsersRepository.FirstOrDefaultAsync(userId, command.IngredientId);
+        var ingredientUser = await _ingredientUsersRepository.FirstOrDefaultAsync(userId, command.IngredientId, cancellationToken);
         
         if (ingredientUser is not null)
         {
             ingredientUser.UkrainianMeasure = command.UkrainianMeasure;
-            await _ingredientUsersRepository.UpdateAsync(ingredientUser);
+            await _ingredientUsersRepository.UpdateAsync(ingredientUser, cancellationToken);
         }
         else
         {
-            await _ingredientUsersRepository.AddAsync(new IngredientUserEntity(command.IngredientId, userId, command.UkrainianMeasure));
+            await _ingredientUsersRepository.AddAsync(
+                new IngredientUserEntity(
+                    command.IngredientId, 
+                    userId, 
+                    command.UkrainianMeasure
+                    ), 
+                cancellationToken
+                );
         }
         
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }

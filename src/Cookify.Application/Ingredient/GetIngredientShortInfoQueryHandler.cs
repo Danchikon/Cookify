@@ -16,7 +16,7 @@ public record GetIngredientShortInfoQueryHandler : IQueryHandler<GetIngredientSh
     
     public async Task<IngredientShortInfoDto> Handle(GetIngredientShortInfoQuery query, CancellationToken cancellationToken)
     {
-        var ingredient = await _ingredientsRepository.FirstAsync<IngredientShortInfoDto>(query.Id);
+        var ingredient = await _ingredientsRepository.FirstAsync<IngredientShortInfoDto>(query.Id, cancellationToken: cancellationToken);
 
         return ingredient;
     }

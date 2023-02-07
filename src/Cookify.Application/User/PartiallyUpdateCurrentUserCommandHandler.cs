@@ -33,19 +33,17 @@ public class PartiallyUpdateCurrentUserCommandHandler : ICommandHandler<Partiall
     {
         var userId = _currentUserService.GetUserId();
 
-        if (!await  _usersRepository.AnyAsync(userId))
+        if (!await  _usersRepository.AnyAsync(userId, cancellationToken))
         {
             throw NotFoundException.Create<UserEntity>(userId);
         }
 
-        var partialEntity = new PartialEntity<UserEntity>();
-
-        partialEntity
+        var partialEntity = new PartialEntity<UserEntity>()
             .AddValue(user => user.Email, query.Email, true)
             .AddValue(user => user.Username, query.Username, true);
 
-        await _usersRepository.PartiallyUpdateAsync(userId, partialEntity);
-        await _unitOfWork.SaveChangesAsync();
+        await _usersRepository.PartiallyUpdateAsync(userId, partialEntity, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         return Unit.Value;
     }

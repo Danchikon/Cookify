@@ -37,7 +37,7 @@ public class RefreshJsonWebTokenCommandHandler : ICommandHandler<RefreshJsonWebT
     {
         var userId = _currentUserService.GetUserId();
         
-        var user = await _userRepository.FirstAsync(userId, UserExpressions.Session());
+        var user = await _userRepository.FirstAsync(userId, UserExpressions.Session(), cancellationToken);
 
         if (user.Session is null)
         {
@@ -56,8 +56,8 @@ public class RefreshJsonWebTokenCommandHandler : ICommandHandler<RefreshJsonWebT
 
         var refreshToken = _authenticationService.GenerateRefreshToken();
         user.Session.RefreshTokenHash = _authenticationService.GetRefreshTokenHash(refreshToken);
-        await _sessionRepository.UpdateAsync(user.Session);
-        await _unitOfWork.SaveChangesAsync();
+        await _sessionRepository.UpdateAsync(user.Session, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return _authenticationService.AuthenticateUser(user, refreshToken);
     }

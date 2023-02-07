@@ -26,8 +26,9 @@ public record GetRecipeCategoryShortInfosQueryHandler : IQueryHandler<GetRecipeC
                 RecipeCategoryExpressions.NameContains(query.NameContains),
                 RecipeCategoryExpressions.UkrainianNameEquals(query.UkrainianNameEquals),
                 RecipeCategoryExpressions.UkrainianNameContains(query.UkrainianNameContains)
-            }
-        );
+            }, 
+            cancellationToken: cancellationToken
+            );
 
         return recipeCategoriesPaginatedList;
     }

@@ -17,6 +17,7 @@ public class RecipeEntity : BaseEntity
     public string? ImageLink { get; set; } 
     public string? PdfLink { get; set; } 
     public string? UkrainianPdfLink { get; set; } 
+    public bool IsPublic { get; set; }
 
     public UserEntity? User { get; set; }
     public Guid CategoryId { get; set; }
@@ -36,6 +37,7 @@ public class RecipeEntity : BaseEntity
         string ukrainianTitle,
         string instruction,
         string ukrainianInstruction,
+        bool isPublic,
         Guid categoryId,
         Guid? createdBy = null
         ) : base(createdBy)
@@ -44,6 +46,7 @@ public class RecipeEntity : BaseEntity
         UkrainianTitle = ukrainianTitle;
         Instruction = instruction;
         UkrainianInstruction = ukrainianInstruction;
+        IsPublic = isPublic; 
         CategoryId = categoryId;
     }
 }

@@ -24,20 +24,20 @@ public class ProductMarketsSeeder : SeederBase
         _unitOfWork = unitOfWork;
     }
     
-    public override async Task SeedAsync()
+    public override async Task SeedAsync(CancellationToken cancellationToken)
     {
         await SeedProductMarketAsync(new ProductMarketEntity("Silpo", "Сільпо", _silpoProductMarketOptions.SiteUrl)
         {
             ImageLink = _silpoProductMarketOptions.ImageUrl
-        });
-        await _unitOfWork.SaveChangesAsync();
+        }, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task SeedProductMarketAsync(ProductMarketEntity productMarket)
+    private async Task SeedProductMarketAsync(ProductMarketEntity productMarket, CancellationToken cancellationToken)
     {
-        if (!await _productMarketsRepository.AnyAsync(ProductMarketExpressions.NameEquals(productMarket.Name)))
+        if (!await _productMarketsRepository.AnyAsync(ProductMarketExpressions.NameEquals(productMarket.Name), cancellationToken))
         {
-            await _productMarketsRepository.AddAsync(productMarket);
+            await _productMarketsRepository.AddAsync(productMarket, cancellationToken);
         }
     }
 }

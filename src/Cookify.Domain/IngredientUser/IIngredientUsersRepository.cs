@@ -4,9 +4,9 @@ namespace Cookify.Domain.IngredientUser;
 
 public interface IIngredientUsersRepository
 {
-    Task AddAsync(IngredientUserEntity ingredientUser);
-    ValueTask UpdateAsync(IngredientUserEntity ingredientUser);
-    Task<IngredientUserEntity?> FirstOrDefaultAsync(Guid userId, Guid ingredientId);
-    Task<IngredientUserEntity> FirstAsync(Guid userId, Guid ingredientId);
-    ValueTask RemoveAsync(IngredientUserEntity ingredientUser);
+    Task AddAsync(IngredientUserEntity ingredientUser, CancellationToken cancellationToken);
+    ValueTask UpdateAsync(IngredientUserEntity ingredientUser, CancellationToken cancellationToken);
+    Task<IngredientUserEntity?> FirstOrDefaultAsync(Guid userId, Guid ingredientId, CancellationToken cancellationToken);
+    Task<IngredientUserEntity> FirstAsync(Guid userId, Guid ingredientId, CancellationToken cancellationToken);
+    ValueTask RemoveAsync(IngredientUserEntity ingredientUser, CancellationToken cancellationToken);
 }

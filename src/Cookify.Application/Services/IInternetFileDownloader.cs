@@ -2,5 +2,5 @@ namespace Cookify.Application.Services;
 
 public interface IInternetFileDownloaderService
 {
-    Task<Stream> DownloadAsync(Uri path);
+    Task<Stream> DownloadAsync(Uri path, CancellationToken cancellationToken);
 }

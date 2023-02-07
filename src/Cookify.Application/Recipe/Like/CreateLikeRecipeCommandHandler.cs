@@ -32,13 +32,13 @@ public record CreateLikeRecipeCommandHandler : ICommandHandler<CreateLikeRecipeC
     {
         var userId = _currentUserService.GetUserId();
 
-        if (!await _recipesRepository.AnyAsync(command.RecipeId))
+        if (!await _recipesRepository.AnyAsync(command.RecipeId, cancellationToken))
         {
             throw NotFoundException.Create<RecipeEntity>(command.RecipeId);
         }
 
-       await _likesRepository.AddAsync(new LikeEntity(command.RecipeId, userId));
-       await _unitOfWork.SaveChangesAsync();
+       await _likesRepository.AddAsync(new LikeEntity(command.RecipeId, userId), cancellationToken);
+       await _unitOfWork.SaveChangesAsync(cancellationToken);
        
        return Unit.Value;
     }

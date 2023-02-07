@@ -1,6 +1,5 @@
 using Cookify.Application.Common.Cqrs;
 using Cookify.Application.Common.Helpers;
-using Cookify.Application.Dtos;
 using Cookify.Application.Models;
 using Cookify.Application.Services;
 using Cookify.Domain.Common.Entities;
@@ -31,27 +30,27 @@ public class UploadCurrentUserAvatarCommandHandler : ICommandHandler<UploadCurre
     
     public async Task<string> Handle(UploadCurrentUserAvatarCommand command, CancellationToken cancellationToken)
     {
-        try
-        {
-            var userId = _currentUserService.GetUserId();
-            var fileName = FileNameFormatter.FormatForUserAvatar(userId);
-        
-            var avatarLink = await _fileStorageService.PutFileAsync(new FileModel(
+      
+        var userId = _currentUserService.GetUserId();
+        var fileName = FileNameFormatter.FormatForUserAvatar(userId);
+
+        var avatarLink = _fileStorageService.GetFileLink(fileName);
+
+        var partialUser = new PartialEntity<UserEntity>()
+            .AddValue(user => user.AvatarImageLink, avatarLink);
+
+        await _usersRepository.PartiallyUpdateAsync(userId, partialUser, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    
+        await _fileStorageService.PutFileAsync(
+            new FileModel(
                 command.FileStream, 
                 command.ContentType, 
                 fileName
-            ));
+                ),
+            cancellationToken
+        );
 
-            var partialUser = new PartialEntity<UserEntity>();
-            partialUser.AddValue(user => user.AvatarImageLink, avatarLink);
-            await _usersRepository.PartiallyUpdateAsync(userId, partialUser);
-            await _unitOfWork.SaveChangesAsync();
-
-            return avatarLink;
-        }
-        finally
-        {
-            await command.DisposeAsync();
-        }
+        return avatarLink;
     }
 }

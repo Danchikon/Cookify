@@ -4,10 +4,10 @@ namespace Cookify.Domain.Common.Repositories;
 
 public interface IRepository<TEntity> : IReadOnlyRepository<TEntity> where TEntity : IEntity<Guid>
 {
-    Task<Guid> AddAsync(TEntity entity);
-    Task AddRangeAsync(IEnumerable<TEntity> entities);
-    ValueTask PartiallyUpdateAsync(Guid id, PartialEntity<TEntity> partialEntity);
-    ValueTask UpdateAsync(TEntity entity);
-    ValueTask RemoveAsync(Guid id, bool softRemove = true);
+    Task<Guid> AddAsync(TEntity entity, CancellationToken cancellationToken = default);
+    Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
+    ValueTask PartiallyUpdateAsync(Guid id, PartialEntity<TEntity> partialEntity, CancellationToken cancellationToken = default);
+    ValueTask UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
+    ValueTask RemoveAsync(Guid id, bool softRemove = true, CancellationToken cancellationToken = default);
     
 }

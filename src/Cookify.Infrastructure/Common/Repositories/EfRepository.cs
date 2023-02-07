@@ -23,18 +23,18 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
         Mapper = mapper;
     }
     
-    public virtual async Task<Guid> AddAsync(TEntity entity)
+    public virtual async Task<Guid> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        var result = await DbContext.Set<TEntity>().AddAsync(entity);
+        var result = await DbContext.Set<TEntity>().AddAsync(entity, cancellationToken);
         return result.Entity.Id;
     }
 
-    public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities)
+    public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
     {
-        await DbContext.Set<TEntity>().AddRangeAsync(entities);
+        await DbContext.Set<TEntity>().AddRangeAsync(entities, cancellationToken);
     }
 
-    public virtual ValueTask PartiallyUpdateAsync(Guid id, PartialEntity<TEntity> partialEntity)
+    public virtual ValueTask PartiallyUpdateAsync(Guid id, PartialEntity<TEntity> partialEntity, CancellationToken cancellationToken = default)
     {
         TEntity entity = new() { Id = id };
         
@@ -62,14 +62,14 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
         return ValueTask.CompletedTask;
     }
 
-    public virtual ValueTask UpdateAsync(TEntity entity)
+    public virtual ValueTask UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         DbContext.Set<TEntity>().Update(entity);
         
         return ValueTask.CompletedTask;
     }
 
-    public virtual async ValueTask RemoveAsync(Guid id, bool softRemove = true)
+    public virtual async ValueTask RemoveAsync(Guid id, bool softRemove = true, CancellationToken cancellationToken = default)
     {
         var dbSet = DbContext.Set<TEntity>();
 
@@ -78,7 +78,7 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
             var partialEntity = new PartialEntity<TEntity>();
             partialEntity.AddValue(entity => entity.IsActive, false);
             
-            await PartiallyUpdateAsync(id, partialEntity);
+            await PartiallyUpdateAsync(id, partialEntity, cancellationToken);
         }
         else
         {
@@ -88,9 +88,13 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
         }
     }
 
-    public virtual async Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>>? expression = null, Expression<Func<TEntity, object?>>? include = null)
+    public virtual async Task<TEntity> FirstAsync(
+        Expression<Func<TEntity, bool>>? expression = null, 
+        Expression<Func<TEntity, object?>>? include = null,
+        CancellationToken cancellationToken = default
+        )
     {
-        var entity = await FirstOrDefaultAsync(expression, include);
+        var entity = await FirstOrDefaultAsync(expression, include, cancellationToken);
 
         if (entity is null)
         {
@@ -100,14 +104,22 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
         return entity;
     }
 
-    public virtual async Task<TEntity> FirstAsync(Guid id, Expression<Func<TEntity, object?>>? include = null)
+    public virtual async Task<TEntity> FirstAsync(
+        Guid id,
+        Expression<Func<TEntity, object?>>? include = null,
+        CancellationToken cancellationToken = default
+        )
     {
-        return await FirstAsync(entity => entity.Id == id, include);
+        return await FirstAsync(entity => entity.Id == id, include, cancellationToken);
     }
 
-    public virtual async Task<TModel> FirstAsync<TModel>(Expression<Func<TEntity, bool>>? expression = null, ICollection<Expression<Func<TEntity, object?>>>? includes = null)
+    public virtual async Task<TModel> FirstAsync<TModel>(
+        Expression<Func<TEntity, bool>>? expression = null, 
+        ICollection<Expression<Func<TEntity, object?>>>? includes = null,
+        CancellationToken cancellationToken = default
+        )
     {
-        var entity = await FirstOrDefaultAsync<TModel>(expression, includes);
+        var entity = await FirstOrDefaultAsync<TModel>(expression, includes, cancellationToken);
 
         if (entity is null)
         {
@@ -117,12 +129,20 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
         return entity;
     }
 
-    public virtual async Task<TModel> FirstAsync<TModel>(Guid id, ICollection<Expression<Func<TEntity, object?>>>? includes = null)
+    public virtual async Task<TModel> FirstAsync<TModel>(
+        Guid id, 
+        ICollection<Expression<Func<TEntity, object?>>>? includes = null,
+        CancellationToken cancellationToken = default
+        )
     {
-        return await FirstAsync<TModel>(entity => entity.Id == id, includes);
+        return await FirstAsync<TModel>(entity => entity.Id == id, includes, cancellationToken);
     }
 
-    public virtual async Task<TModel?> FirstOrDefaultAsync<TModel>(Expression<Func<TEntity, bool>>? expression = null, ICollection<Expression<Func<TEntity, object?>>>? includes = null)
+    public virtual async Task<TModel?> FirstOrDefaultAsync<TModel>(
+        Expression<Func<TEntity, bool>>? expression = null, 
+        ICollection<Expression<Func<TEntity, object?>>>? includes = null,
+        CancellationToken cancellationToken = default
+        )
     {
         var entities = DbContext.Set<TEntity>().AsNoTracking();
             
@@ -133,15 +153,23 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
 
         return await entities.Where(expression ?? (_ => true))
             .ProjectTo<TModel>(Mapper.ConfigurationProvider)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public virtual async Task<TModel?> FirstOrDefaultAsync<TModel>(Guid id, ICollection<Expression<Func<TEntity, object?>>>? includes = null)
+    public virtual async Task<TModel?> FirstOrDefaultAsync<TModel>(
+        Guid id, 
+        ICollection<Expression<Func<TEntity, object?>>>? includes = null,
+        CancellationToken cancellationToken = default
+        )
     {
-        return await FirstOrDefaultAsync<TModel?>(entity => entity.Id == id, includes);
+        return await FirstOrDefaultAsync<TModel?>(entity => entity.Id == id, includes, cancellationToken);
     }
 
-    public virtual async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? expression = null, Expression<Func<TEntity, object?>>? include = null)
+    public virtual async Task<TEntity?> FirstOrDefaultAsync(
+        Expression<Func<TEntity, bool>>? expression = null, 
+        Expression<Func<TEntity, object?>>? include = null,
+        CancellationToken cancellationToken = default
+        )
     {
         var entities = DbContext.Set<TEntity>().AsNoTracking();
 
@@ -150,15 +178,18 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
             entities = entities.Include(include);
         }
 
-        return await entities.FirstOrDefaultAsync(expression ?? (_ => true));
+        return await entities.FirstOrDefaultAsync(expression ?? (_ => true), cancellationToken);
     }
 
-    public virtual async Task<TEntity?> FirstOrDefaultAsync(Guid id, Expression<Func<TEntity, object?>>? include = null)
+    public virtual async Task<TEntity?> FirstOrDefaultAsync(Guid id, Expression<Func<TEntity, object?>>? include = null, CancellationToken cancellationToken = default)
     {
-        return await FirstOrDefaultAsync(entity => entity.Id == id, include);
+        return await FirstOrDefaultAsync(entity => entity.Id == id, include, cancellationToken);
     }
 
-    public virtual async Task<List<TModel>> WhereAsync<TModel>(params Expression<Func<TEntity, bool>>[]? expressions)
+    public virtual async Task<List<TModel>> WhereAsync<TModel>(
+        ICollection<Expression<Func<TEntity, bool>>>? expressions = null,
+        CancellationToken cancellationToken = default
+        )
     {
         var entities = DbContext.Set<TEntity>().AsNoTracking();
 
@@ -169,10 +200,14 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
 
         return await entities
             .ProjectTo<TModel>(Mapper.ConfigurationProvider)
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken);
     }
 
-    public virtual async Task<List<TEntity>> WhereAsync(ICollection<Expression<Func<TEntity, bool>>>? expressions = null, ICollection<Expression<Func<TEntity, object?>>>? includes = null)
+    public virtual async Task<List<TEntity>> WhereAsync(
+        ICollection<Expression<Func<TEntity, bool>>>? expressions = null, 
+        ICollection<Expression<Func<TEntity, object?>>>? includes = null,
+        CancellationToken cancellationToken = default
+        )
     {
         var entities = DbContext.Set<TEntity>().AsNoTracking();
 
@@ -186,7 +221,7 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
             entities = includes.Aggregate(entities, (queryable, include) => queryable.Include(include));
         }
 
-        return await entities.ToListAsync();
+        return await entities.ToListAsync(cancellationToken: cancellationToken);
     }
 
     public virtual async Task<IPaginatedList<TModel>> PaginateAsync<TModel>(
@@ -194,7 +229,8 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
         uint pageSize,
         uint offset = 0,
         ICollection<Expression<Func<TEntity, object?>>>? includes = null,
-        ICollection<Expression<Func<TEntity, bool>>>? expressions = null
+        ICollection<Expression<Func<TEntity, bool>>>? expressions = null,
+        CancellationToken cancellationToken = default
         )
     {
         var entities = DbContext.Set<TEntity>().AsNoTracking();
@@ -211,21 +247,28 @@ public class EfRepository<TEntity, TContext> : IRepository<TEntity>
 
         return await entities
             .ProjectTo<TModel>(Mapper.ConfigurationProvider)
-            .PaginateByPageSizeAsync(page, pageSize, offset);
+            .PaginateByPageSizeAsync(page, pageSize, offset, cancellationToken);
     }
 
-    public virtual async Task<bool> AnyAsync(Guid id)
+    public virtual async Task<bool> AnyAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await AnyAsync(entity => entity.Id == id);
+        return await AnyAsync(entity => entity.Id == id, cancellationToken);
     }
 
-    public virtual async Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? expression = null)
+    public virtual async Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? expression = null, CancellationToken cancellationToken = default)
     {
-        return await DbContext.Set<TEntity>().AnyAsync(expression ?? (_ => true));
+        return await DbContext.Set<TEntity>().AnyAsync(expression ?? (_ => true), cancellationToken: cancellationToken);
     }
 
-    public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>>? expression = null)
+    public virtual async Task<int> CountAsync(ICollection<Expression<Func<TEntity, bool>>>? expressions = null, CancellationToken cancellationToken = default)
     {
-        return await DbContext.Set<TEntity>().CountAsync(expression ?? (_ => true));
+        var entities = DbContext.Set<TEntity>().AsNoTracking();
+
+        if (expressions is not null)
+        {
+            entities = expressions.Aggregate(entities, (queryable, expression) => queryable.Where(expression));
+        }
+        
+        return await entities.CountAsync(cancellationToken: cancellationToken);
     }
 }

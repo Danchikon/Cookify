@@ -11,6 +11,7 @@ public record UserDto
     public string Email { get; init; } = null!;
     public string Username { get; init; } = null!;
     public string? AvatarImageLink { get; init; }
+    public ICollection<RecipeShortInfoDto> Recipes { get; init; } = Array.Empty<RecipeShortInfoDto>();
     public ICollection<RecipeShortInfoDto> FavoriteRecipes { get; init; } = Array.Empty<RecipeShortInfoDto>();
     public ICollection<RecipeShortInfoDto> LikedRecipes { get; init; } = Array.Empty<RecipeShortInfoDto>();
     public ICollection<IngredientUserShortInfoDto> AvailableIngredients { get; init; } = Array.Empty<IngredientUserShortInfoDto>();

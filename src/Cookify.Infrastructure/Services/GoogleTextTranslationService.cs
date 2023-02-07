@@ -16,11 +16,11 @@ public class GoogleTextTranslationService : ITextTranslationService
         _logger = logger;
     }
     
-    public async Task<string> TranslateAsync(string sourceText, string sourceLanguage, string targetLanguage)
+    public async Task<string> TranslateAsync(string sourceText, string sourceLanguage, string targetLanguage, CancellationToken cancellationToken)
     { 
         _logger.LogInformation("Translating text: {Text}", sourceText);
         
-        var translationResult = await _translationClient.TranslateTextAsync(sourceText, targetLanguage, sourceLanguage);
+        var translationResult = await _translationClient.TranslateTextAsync(sourceText, targetLanguage, sourceLanguage, cancellationToken: cancellationToken);
         
         _logger.LogInformation("Text translated: {Text}", sourceText);
         

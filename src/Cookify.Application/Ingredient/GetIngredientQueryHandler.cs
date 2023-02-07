@@ -18,7 +18,7 @@ public record GetIngredientQueryHandler : IQueryHandler<GetIngredientQuery, Ingr
     
     public async Task<IngredientDto> Handle(GetIngredientQuery query, CancellationToken cancellationToken)
     {
-        var ingredient = await _ingredientsRepository.FirstAsync<IngredientDto>(query.Id);
+        var ingredient = await _ingredientsRepository.FirstAsync<IngredientDto>(query.Id, cancellationToken: cancellationToken);
 
         return ingredient;
     }

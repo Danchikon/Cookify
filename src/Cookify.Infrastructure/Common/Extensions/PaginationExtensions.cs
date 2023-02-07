@@ -10,14 +10,15 @@ public static class PaginationExtensions
         this IQueryable<TEntity> source,
         uint page, 
         uint pageSize,
-        uint offset = 0
+        uint offset = 0,
+        CancellationToken cancellationToken = default
     )
     {
-        var totalCount = await source.CountAsync();
+        var totalCount = await source.CountAsync(cancellationToken: cancellationToken);
         var items = await source
             .Skip((int)(pageSize * (page - 1) + offset))
             .Take((int)pageSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken);
 
         return new PaginatedList<TEntity>(items, (uint)totalCount, page, offset);
     }

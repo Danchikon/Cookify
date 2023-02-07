@@ -11,6 +11,7 @@ public record GetRecipeShortInfosQuery(PaginationOptions? Pagination)
     public string? TitleEquals { get; set; }
     public string? UkrainianTitleContains { get; set; }
     public string? UkrainianTitleEquals { get; set; }
+    public bool? IsPublicEquals { get; set; }
     public ICollection<Guid>? IngredientsIdsIntersects { get; set; }
     public Guid? CategoryIdEquals { get; set; }
 }

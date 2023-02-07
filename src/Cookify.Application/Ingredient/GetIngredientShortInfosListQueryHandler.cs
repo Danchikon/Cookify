@@ -16,12 +16,12 @@ public record GetIngredientShortInfosListQueryHandler : IQueryHandler<GetIngredi
     
     public async Task<IList<IngredientShortInfoDto>> Handle(GetIngredientShortInfosListQuery query, CancellationToken cancellationToken)
     {
-        var mealCategoriesList = await _ingredientsRepository.WhereAsync<IngredientShortInfoDto>(
+        var mealCategoriesList = await _ingredientsRepository.WhereAsync<IngredientShortInfoDto>(new [] {
             IngredientExpressions.NameEquals(query.NameEquals), 
             IngredientExpressions.NameContains(query.NameContains),
             IngredientExpressions.UkrainianNameEquals(query.UkrainianNameEquals), 
             IngredientExpressions.UkrainianNameContains(query.UkrainianNameContains)
-        );
+        }, cancellationToken);
 
         return mealCategoriesList;
     }

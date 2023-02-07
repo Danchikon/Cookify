@@ -26,8 +26,9 @@ public record GetIngredientShortInfosQueryHandler : IQueryHandler<GetIngredientS
                 IngredientExpressions.NameContains(query.NameContains),
                 IngredientExpressions.UkrainianNameEquals(query.UkrainianNameEquals),
                 IngredientExpressions.UkrainianNameContains(query.UkrainianNameContains)
-            }
-        );
+            }, 
+            cancellationToken: cancellationToken
+            );
 
         return ingredientsPaginatedList;
     }

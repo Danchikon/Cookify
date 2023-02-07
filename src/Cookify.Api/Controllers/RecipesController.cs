@@ -10,6 +10,7 @@ using Cookify.Application.Recipe.Like;
 using Cookify.Application.RecipeCategory;
 using Cookify.Domain.Common.Pagination;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -34,6 +35,34 @@ public class RecipesController : ApiControllerBase
     public async Task<IActionResult> GetRecipeAsync([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         return Ok(await Mediator.Send(new GetRecipeQuery(id), cancellationToken));
+    }
+    
+    [Authorize]
+    [HttpPost]
+    [Consumes("multipart/form-data")]
+    [SwaggerOperation(
+        Summary = "Creates recipe",
+        Description = "Requires authenticated user",
+        OperationId = nameof(CreateRecipeAsync)
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Recipe has been successfully created", typeof(Guid))]
+    public async Task<IActionResult> CreateRecipeAsync(
+        IFormFile image,
+        [FromForm] CreateRecipeDto dto,
+        CancellationToken cancellationToken
+        )
+    {
+        var command = new CreateRecipeCommand
+        {
+            UkrainianTitle = dto.UkrainianTitle,
+            UkrainianInstruction = dto.UkrainianInstruction,
+            CategoryId = dto.CategoryId,
+            IsPublic = dto.IsPublic,
+            ImageStream = image.OpenReadStream(),
+            ImageContentType = image.ContentType
+        };
+        
+        return Ok(await Mediator.Send(command, cancellationToken));
     }
     
     [HttpPost("{id:guid}/users/current/favorite")]
@@ -106,7 +135,8 @@ public class RecipesController : ApiControllerBase
     [SwaggerResponse(StatusCodes.Status200OK, "Recipe short infos paginated list has been successfully returned", typeof(IPaginatedList<RecipeCategoryShortInfoDto>))]
     public async Task<IActionResult> GetRecipeShortInfosAsync(
         [FromQuery] GetRecipeShortInfosQuery query, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+        )
     {
         return Ok(await Mediator.Send(query, cancellationToken));
     }
@@ -121,7 +151,8 @@ public class RecipesController : ApiControllerBase
     [SwaggerResponse(StatusCodes.Status200OK, "Random recipe short infos paginated list has been successfully returned", typeof(IPaginatedList<RecipeCategoryShortInfoDto>))]
     public async Task<IActionResult> GetRandomRecipeShortInfosAsync(
         [FromQuery] GetRandomRecipeShortInfosQuery query, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+        )
     {
         return Ok(await Mediator.Send(query, cancellationToken));
     }

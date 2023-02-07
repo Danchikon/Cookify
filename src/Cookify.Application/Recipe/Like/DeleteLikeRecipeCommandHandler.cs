@@ -27,10 +27,14 @@ public record DeleteLikeRecipeCommandHandler : ICommandHandler<DeleteLikeRecipeC
     public async Task<Unit> Handle(DeleteLikeRecipeCommand command, CancellationToken cancellationToken)
     { 
         var userId = _currentUserService.GetUserId();
-        var favorite = await _likesRepository.FirstAsync(LikeExpressions.RecipeIdAndCreatedByEquals(command.RecipeId, userId));
+        
+        var like = await _likesRepository.FirstAsync(
+            LikeExpressions.RecipeIdAndCreatedByEquals(command.RecipeId, userId), 
+            cancellationToken: cancellationToken
+            );
 
-        await _likesRepository.RemoveAsync(favorite.Id, false); 
-        await _unitOfWork.SaveChangesAsync();
+        await _likesRepository.RemoveAsync(like.Id, false, cancellationToken); 
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         return Unit.Value;
     }

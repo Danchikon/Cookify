@@ -34,10 +34,10 @@ public class IngredientsSearcherJob : IJob
     
     public async Task Execute(IJobExecutionContext context)
     {
-        var ingredients = await _ingredientsRepository.WhereAsync();
+        var ingredients = await _ingredientsRepository.WhereAsync(cancellationToken: context.CancellationToken);
         foreach (var ingredient in ingredients)
         {
-            var marketProduct = await _silpoProductMarketService.GetProductAsync(ingredient.UkrainianName);
+            var marketProduct = await _silpoProductMarketService.GetProductAsync(ingredient.UkrainianName, context.CancellationToken);
      
             break;
         }

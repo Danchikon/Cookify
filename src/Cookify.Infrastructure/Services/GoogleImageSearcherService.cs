@@ -20,15 +20,15 @@ public class GoogleImageSearcherService : IImageSearcherService
         _logger = logger;
     }
     
-    public async Task<string?> FirstImageAsync(string query)
+    public async Task<string?> FirstImageAsync(string query, CancellationToken cancellationToken)
     {
         try
         {
-            await SemaphoreSlim.WaitAsync();
+            await SemaphoreSlim.WaitAsync(cancellationToken);
             
             _logger.LogInformation("Searching image {Query}", query);
             
-            var document = await _browsingContext.OpenAsync($"{GoogleBaseUrl}/search?q={query.Replace(' ', '+')}&tbm=isch");
+            var document = await _browsingContext.OpenAsync($"{GoogleBaseUrl}/search?q={query.Replace(' ', '+')}&tbm=isch", cancellation: cancellationToken);
 
             var imageLink = document.Images.FirstOrDefault(imageElement => imageElement.ClassName == "yWs4tf")?.Source;
 

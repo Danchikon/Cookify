@@ -49,7 +49,8 @@ public static class ApplicationBuilderExtensions
     
     #endregion
     
-    public static async Task<IApplicationBuilder> UseDatabaseAsync<TDbContext>(this IApplicationBuilder builder) where TDbContext : DbContext
+    public static async Task<IApplicationBuilder> UseDatabaseAsync<TDbContext>(this IApplicationBuilder builder, CancellationToken cancellationToken) 
+        where TDbContext : DbContext
     {
         var options = builder.ApplicationServices.GetRequiredService<IOptions<EfDatabaseOptions>>().Value;
         var serviceScopeFactory = builder.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
@@ -60,7 +61,7 @@ public static class ApplicationBuilderExtensions
 
         if (options.MigratingEnabled)
         {
-            await dbContext.Database.MigrateAsync();
+            await dbContext.Database.MigrateAsync(cancellationToken);
         }
 
         if (!options.SeedingEnabled)
@@ -70,7 +71,7 @@ public static class ApplicationBuilderExtensions
         
         foreach (var seeder in seeders)
         {
-            await seeder.SeedAsync();
+            await seeder.SeedAsync(cancellationToken);
         }
 
         return builder;

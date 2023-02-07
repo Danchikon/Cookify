@@ -48,7 +48,7 @@ public class TheMealDbIngredientsCachingJob : IJob
     
     public async Task Execute(IJobExecutionContext context)
     {
-        var responseDto = await _theMealDbApi.GetIngredientsAsync();
+        var responseDto = await _theMealDbApi.GetIngredientsAsync(context.CancellationToken);
 
         var existedIngredients = await _ingredientsRepository.WhereAsync(new []
         {
@@ -66,10 +66,11 @@ public class TheMealDbIngredientsCachingJob : IJob
                 var translateNameAsyncTask = _textTranslationService.TranslateAsync( 
                     sourceText: dto.Name, 
                     sourceLanguage: TranslatingConstants.EnglishLanguage, 
-                    targetLanguage: TranslatingConstants.UkrainianLanguage
+                    targetLanguage: TranslatingConstants.UkrainianLanguage,
+                    cancellationToken: context.CancellationToken
                     );
                 
-                var firstImageAsyncTask = _imageSearcherService.FirstImageAsync(dto.Name);
+                var firstImageAsyncTask = _imageSearcherService.FirstImageAsync(dto.Name, context.CancellationToken);
                 Task<string>? translateDescriptionAsyncTask = null;
             
                 if (!string.IsNullOrWhiteSpace(dto.Description))
@@ -77,7 +78,8 @@ public class TheMealDbIngredientsCachingJob : IJob
                     translateDescriptionAsyncTask = _textTranslationService.TranslateAsync( 
                         sourceText: dto.Description, 
                         sourceLanguage: TranslatingConstants.EnglishLanguage, 
-                        targetLanguage: TranslatingConstants.UkrainianLanguage
+                        targetLanguage: TranslatingConstants.UkrainianLanguage,
+                        cancellationToken: context.CancellationToken
                         );
                 }
 
@@ -97,10 +99,10 @@ public class TheMealDbIngredientsCachingJob : IJob
                     return ingredientEntity;
                 }
             
-                await using var imageStream = await _internetFileDownloaderService.DownloadAsync(new Uri(imageLink));
+                await using var imageStream = await _internetFileDownloaderService.DownloadAsync(new Uri(imageLink), context.CancellationToken);
             
                 var imageName = FileNameFormatter.FormatForIngredientImage(ingredientEntity.Id);
-                await _fileStorageService.PutFileAsync(new FileModel(imageStream, "image/jpeg", imageName));
+                await _fileStorageService.PutFileAsync(new FileModel(imageStream, "image/jpeg", imageName), context.CancellationToken);
                 ingredientEntity.ImageLink = _fileStorageService.GetFileLink(imageName);
             
                 return ingredientEntity;
@@ -115,8 +117,8 @@ public class TheMealDbIngredientsCachingJob : IJob
 
         try
         {
-            await _ingredientsRepository.AddRangeAsync(ingredients);
-            await _unitOfWork.SaveChangesAsync();
+            await _ingredientsRepository.AddRangeAsync(ingredients, context.CancellationToken);
+            await _unitOfWork.SaveChangesAsync(context.CancellationToken);
         }
         catch (Exception exception)
         {

@@ -26,11 +26,11 @@ public class GoogleFileStorageService : IFileStorageService
         _logger = logger;
     }
 
-    public async Task<string> PutFileAsync(FileModel file)
+    public async Task<string> PutFileAsync(FileModel file, CancellationToken cancellationToken)
     {
         try
         {
-            await SemaphoreSlim.WaitAsync();
+            await SemaphoreSlim.WaitAsync(cancellationToken);
             
             _logger.LogInformation("Putting {FileName} file into google storage", file.Name);
             
@@ -38,8 +38,9 @@ public class GoogleFileStorageService : IFileStorageService
                 _options.Bucket,
                 file.Name,
                 file.ContentType,
-                file.Stream
-            );
+                file.Stream, 
+                cancellationToken: cancellationToken
+                );
 
             _logger.LogInformation("File {FileName} putted into google storage", file.Name);
             
@@ -57,16 +58,16 @@ public class GoogleFileStorageService : IFileStorageService
         return $"{_options.Url}/{_options.Bucket}/{fileName}";
     }
 
-    public async Task<FileModel> GetFileAsync(string fileName)
+    public async Task<FileModel> GetFileAsync(string fileName, CancellationToken cancellationToken)
     {
         var stream = new MemoryStream();
-        var file = await _storageClient.Value.DownloadObjectAsync(_options.Bucket, fileName, stream);
+        var file = await _storageClient.Value.DownloadObjectAsync(_options.Bucket, fileName, stream, cancellationToken: cancellationToken);
         
         return new FileModel(stream, file.ContentType, file.Name);
     }
 
-    public async Task RemoveFileAsync(string fileName)
+    public async Task RemoveFileAsync(string fileName, CancellationToken cancellationToken)
     {
-        await _storageClient.Value.DeleteObjectAsync(_options.Bucket, fileName);
+        await _storageClient.Value.DeleteObjectAsync(_options.Bucket, fileName, cancellationToken: cancellationToken);
     }
 }

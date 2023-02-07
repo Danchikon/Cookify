@@ -32,10 +32,10 @@ public record DeleteIngredientUserCommandHandler : ICommandHandler<DeleteIngredi
     {
         var userId = _currentUserService.GetUserId();
 
-        var ingredientUser = await _ingredientUsersRepository.FirstAsync(userId, command.IngredientId);
+        var ingredientUser = await _ingredientUsersRepository.FirstAsync(userId, command.IngredientId, cancellationToken);
 
-        await _ingredientUsersRepository.RemoveAsync(ingredientUser);
-        await _unitOfWork.SaveChangesAsync();
+        await _ingredientUsersRepository.RemoveAsync(ingredientUser, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }
