@@ -39,7 +39,7 @@ public record GetRecipeShortInfosQueryHandler : IQueryHandler<GetRecipeShortInfo
             {
                 RecipeExpressions.CategoryIdEquals(query.CategoryIdEquals),
                 RecipeExpressions.IsPublicEquals(query.IsPublicEquals),
-                RecipeExpressions.CreateByEquals(userId),
+                RecipeExpressions.CreateByEqualsNullOr(userId),
                 RecipeExpressions.IngredientsIdsIntersects(query.IngredientsIdsIntersects),
                 RecipeExpressions.UkrainianTitleContains(query.UkrainianTitleContains),
                 RecipeExpressions.TitleContains(query.TitleContains),

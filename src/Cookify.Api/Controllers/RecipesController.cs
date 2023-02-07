@@ -46,6 +46,7 @@ public class RecipesController : ApiControllerBase
         OperationId = nameof(CreateRecipeAsync)
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Recipe has been successfully created", typeof(Guid))]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized", typeof(ErrorDto))]
     public async Task<IActionResult> CreateRecipeAsync(
         IFormFile image,
         [FromForm] CreateRecipeDto dto,
@@ -63,6 +64,22 @@ public class RecipesController : ApiControllerBase
         };
         
         return Ok(await Mediator.Send(command, cancellationToken));
+    }
+    
+    [Authorize]
+    [HttpDelete("{id:guid}")]
+    [SwaggerOperation(
+        Summary = "Deletes recipe",
+        Description = "Requires authenticated user",
+        OperationId = nameof(DeleteRecipeAsync)
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Recipe has been successfully deleted")]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "User unauthorized", typeof(ErrorDto))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Recipe not found", typeof(ErrorDto))]
+    public async Task<IActionResult> DeleteRecipeAsync([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        await Mediator.Send(new DeleteRecipeCommand(id), cancellationToken);
+        return NoContent();
     }
     
     [HttpPost("{id:guid}/users/current/favorite")]

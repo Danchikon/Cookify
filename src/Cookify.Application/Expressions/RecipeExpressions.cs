@@ -22,6 +22,11 @@ public static class RecipeExpressions
         return recipe => (checkNull && createdBy == null) || recipe.CreatedBy == createdBy;
     }
     
+    public static Expression<Func<RecipeEntity, bool>> CreateByEqualsNullOr(Guid? createdBy)
+    {
+        return recipe => recipe.CreatedBy == createdBy || recipe.CreatedBy == null;
+    }
+    
     public static Expression<Func<RecipeEntity, object?>> IngredientRecipes()
     {
         return recipe => recipe.IngredientRecipes;
